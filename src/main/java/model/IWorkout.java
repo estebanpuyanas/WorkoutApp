@@ -1,8 +1,11 @@
 package model;
 
+import java.util.List;
+
 public interface IWorkout {
-    public void addWorkout(IRoutine routine);
-    public void removeWorkout(IRoutine routine);
-    public void editWorkout(IRoutine routine);
+    public void addExercise(IExercise exercise);
+    public void removeExercise(IExercise exercise);
+    public void editExercise(IExercise previousExercise, IExercise newExercise);
     public void printWorkout();
+    public List<IExercise> getExerciseList();
 }
