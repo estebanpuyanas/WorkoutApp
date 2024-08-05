@@ -133,6 +133,7 @@ public class Exercise implements IExercise {
      */
     @Override
     public void updateReps(int setIndex, int reps) {
+        checkUpdateRepsDifferent(getRepsForSpecificSet(setIndex), reps);
         if(setIndex >= 0 && setIndex < sets){
             this.repsPerSet.put(setIndex, reps);
         } else {
@@ -164,7 +165,8 @@ public class Exercise implements IExercise {
      * @param mode the mode.
      */
     @Override
-    public void setMode(Mode mode) {
+    public void updateMode(Mode mode) {
+        checkUpdateModeDifferent(getMode(), mode);
         this.mode = mode;
     }
 
@@ -242,4 +244,15 @@ public class Exercise implements IExercise {
         }
     }
 
+    private void checkUpdateRepsDifferent(int currentReps, int newReps){
+        if(currentReps == newReps){
+            throw new IllegalArgumentException("Rep number must be different in order to update");
+        }
+    }
+
+    private void checkUpdateModeDifferent(Mode currentMode, Mode newMode){
+        if(currentMode == newMode){
+            throw new IllegalArgumentException("Modes must be different for mode updating to work");
+        }
+    }
 }

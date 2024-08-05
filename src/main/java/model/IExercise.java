@@ -82,7 +82,7 @@ public interface IExercise {
      * Sets the mode of this exercise.
      * @param mode the mode.
      */
-    public void setMode(Mode mode);
+    public void updateMode(Mode mode);
 
     /**
      * Obtains the mode of this exercise.
