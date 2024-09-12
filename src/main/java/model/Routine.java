@@ -3,24 +3,24 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Routine  implements IRoutine{
+public class Routine implements IRoutine {
 
-   private String name;
-   private List<IWorkout> routine;
+    private final String name;
+    private final List<IWorkout> routine;
 
-   public Routine(String name){
-       this.name = name;
-       this.routine = new ArrayList<>();
-   }
+    public Routine(String name) {
+        this.name = name;
+        this.routine = new ArrayList<>();
+    }
 
     @Override
     public IRoutine createRoutine(String name) {
-       return new Routine(name);
+        return new Routine(name);
     }
 
     @Override
     public void deleteRoutine() {
-       this.routine.clear();
+        this.routine.clear();
     }
 
     @Override
@@ -30,9 +30,9 @@ public class Routine  implements IRoutine{
 
     @Override
     public void printRoutine() {
-       System.out.println(routine);
-       for(IWorkout workout : routine){
-           System.out.println(workout.getExerciseList());
-       }
+        System.out.println(routine);
+        for (IWorkout workout : routine) {
+            System.out.println(workout.getExerciseList());
+        }
     }
 }

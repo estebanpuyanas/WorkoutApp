@@ -1,11 +1,17 @@
 package model;
 
 public interface IData {
-    public double delta(IExercise exercise);
-    public double mean(IExercise exercise);
-    public double mode(IExercise exercise);
-    public double standardDev(IExercise exercise);
-    public double range(IExercise exercise);
-    public double cumulativeSum(IExercise exercise);
-    public double zCore(IExercise exercise);
+    double delta(IExercise exercise);
+
+    double mean(IExercise exercise);
+
+    double mode(IExercise exercise);
+
+    double standardDev(IExercise exercise);
+
+    double range(IExercise exercise);
+
+    double cumulativeSum(IExercise exercise);
+
+    double zCore(IExercise exercise);
 }

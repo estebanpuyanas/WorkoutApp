@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Workout implements IWorkout {
 
-    private String name;
-    private List<IExercise> exerciseList;
+    private final String name;
+    private final List<IExercise> exerciseList;
 
     public Workout(String name) {
         this.name = name;
@@ -14,7 +14,7 @@ public class Workout implements IWorkout {
         checkWorkoutSizeValid(exerciseList);
     }
 
-    public Workout createWorkout(String name){
+    public Workout createWorkout(String name) {
         checkNameWorkoutNameValid(name);
         return new Workout(name);
     }
@@ -30,7 +30,7 @@ public class Workout implements IWorkout {
     }
 
     @Override
-    public void deleteExercise(IExercise exercise){
+    public void deleteExercise(IExercise exercise) {
         exercise.deleteExercise();
         this.exerciseList.removeIf(IExercise::isDeleted);
     }
@@ -39,39 +39,38 @@ public class Workout implements IWorkout {
     public void editExercise(IExercise previousExercise, IExercise newExercise) {
         checkExerciseEditIsDifferent(previousExercise, newExercise);
         int index = this.exerciseList.indexOf(previousExercise);
-        if(index != -1){
+        if (index != -1) {
             this.exerciseList.set(index, newExercise);
         }
     }
 
     @Override
-    public List<IExercise> getExerciseList(){
+    public List<IExercise> getExerciseList() {
         return exerciseList;
     }
 
     @Override
     public void printWorkout() {
-        System.out.println("Workout: " + this.name);
-        for (IExercise exercise : exerciseList) {
-            System.out.println(exercise.getName() + "\n" +
-                    exercise.getSets() + " sets" + exercise.getRepsForAllSets() + " reps");
+        System.out.println(name);
+        for (IExercise exercise : exerciseList){
+            exercise.printExercise();
         }
     }
 
-    private void checkNameWorkoutNameValid(String name){
-        if(name.isEmpty()){
+    private void checkNameWorkoutNameValid(String name) {
+        if (name.isEmpty()) {
             throw new IllegalArgumentException("Workout must have a name");
         }
     }
 
-    private void checkWorkoutSizeValid(List<IExercise> exerciseList){
-        if(exerciseList.isEmpty()){
+    private void checkWorkoutSizeValid(List<IExercise> exerciseList) {
+        if (exerciseList.isEmpty()) {
             throw new IllegalStateException("A workout must have at least one exercise");
         }
     }
 
-    private void checkExerciseEditIsDifferent(IExercise previousExercise, IExercise newExercise){
-        if(previousExercise.equals(newExercise)){
+    private void checkExerciseEditIsDifferent(IExercise previousExercise, IExercise newExercise) {
+        if (previousExercise.equals(newExercise)) {
             throw new IllegalStateException("An exercise must be different in at least one capacity for edit");
         }
     }

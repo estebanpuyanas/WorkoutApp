@@ -41,6 +41,15 @@ Model Interfaces:
   1. createRoutine();
   2. deleteRoutine();
   3. editRoutine();
+
+CHANGELOG:
+
+SEPT 11 2024
+IEXERCISE/EXERCISE:
+1. Added int targetReps into the structure of Exercise, that way when printing/acessing data there
+is a differenfe between actual reps achieved and targetReps. 
+2. Created printing methid. 
+3. Created hashcode and equals method in interface, began implementation in class. 
   
 
 
