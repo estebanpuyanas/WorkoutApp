@@ -234,14 +234,32 @@ public class Exercise implements IExercise {
 
     @Override
     public int hashcode(){
-        return 0;
-        //TODO FINISH IMPLEMENTING.
+        int result = name.hashCode();
+        result = 31 * result + Integer.hashCode(sets);
+        result = 31 * result + Integer.hashCode(targetReps);
+        result = 31 * result + Double.hashCode(weight);
+        result = 31 * result + (mode != null ? mode.hashCode() : 0);
+        return result;
     }
 
     @Override
     public boolean equals(Object object){
-        return true;
-        //TODO FINISH IMPLEMENTING.
+
+        if(this == object){
+            return true;
+        }
+
+        if(object == null || getClass() != object.getClass()){
+            return  false;
+        }
+
+        Exercise other = (Exercise) object;
+
+        return this.name.equals(other.name) &&
+                this.mode.equals(other.mode) &&
+                Double.compare(this.weight, other.weight) == 0 &&
+                this.sets == other.sets &&
+                this.targetReps == other.targetReps;
     }
 
     @Override

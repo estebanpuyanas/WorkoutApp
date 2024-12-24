@@ -5,7 +5,7 @@ public interface IRoutine {
 
     void deleteRoutine();
 
-    void editRoutine();
+    void editRoutine(int oldIndex, int newIndex);
 
     void printRoutine();
 }

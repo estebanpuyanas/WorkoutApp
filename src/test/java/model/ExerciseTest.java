@@ -21,6 +21,15 @@ public class ExerciseTest {
     }
 
     @Test
+    public void getTargetRepsWorksOnValidInput(){
+
+        Map<Integer, Integer> repsPerSet = new HashMap<>();
+        Exercise exercise = new Exercise("Shoulder Press", 4, repsPerSet,8,50.00, Mode.DUMBBELL);
+
+        Assert.assertEquals(8, exercise.getTargetReps());
+    }
+
+    @Test
     public void updateFunctionsOnExerciseWorkOnValidInput() {
         Map<Integer, Integer> repsPerSet = new HashMap<>();
         repsPerSet.put(0, 5);
@@ -38,6 +47,9 @@ public class ExerciseTest {
         newExercise.updateReps(0, 12);
         Assert.assertEquals(Integer.valueOf(12), newExercise.getRepsForSpecificSet(0));
 
+        newExercise.updateTargetReps(12);
+        Assert.assertEquals(12, newExercise.getTargetReps());
+
         newExercise.updateWeight(45.00);
         Assert.assertEquals(45.00, newExercise.getWeight(),0.00);
     }
@@ -54,5 +66,24 @@ public class ExerciseTest {
         Assert.assertThrows(NullPointerException.class, () -> newExercise.updateReps(-5, 5));
         Assert.assertThrows(NullPointerException.class, () -> newExercise.updateReps(3, 5));
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateMode(Mode.DUMBBELL));
+    }
+
+    @Test
+    public void equalOverrideWorksWhenTrue(){
+        Map<Integer, Integer> repsPerSet = new HashMap<>();
+        Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
+        Exercise e2 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
+
+        Assert.assertTrue(e1.equals(e2));
+    }
+
+    @Test
+    public void equalOverrideFailsWhenFalse(){
+        Map<Integer, Integer> repsPerSet = new HashMap<>();
+        Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
+        Exercise e2 = new Exercise("Incline Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
+
+        Assert.assertFalse((e1.equals(e2)));
+
     }
 }
