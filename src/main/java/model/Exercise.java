@@ -1,14 +1,17 @@
 package model;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Implementation of IExercise interface that represents an exercise. An exercise is composed of the following parameters:
+ * Implementation of IExercise interface that represents an exercise.
+ * An exercise is composed of the following parameters:
  * 1. Name
  * 2. Number of sets
  * 3. Repetitions per set.
  * 4. Weight used in exercise.
- * 5. Mod
+ * 5. Mode
  */
 public class Exercise implements IExercise {
 
@@ -40,12 +43,6 @@ public class Exercise implements IExercise {
     private Mode mode;
 
     /**
-     * Flag checking whether exercise has been deleted.
-     */
-    private boolean isDeleted;
-
-
-    /**
      * Default constructor for a new exercise.
      *
      * @param name       the name of the exercise.
@@ -57,14 +54,13 @@ public class Exercise implements IExercise {
     public Exercise(String name, int sets, Map<Integer, Integer> repsPerSet, int targetReps, double weight, Mode mode) {
         this.name = name;
         this.sets = sets;
-        this.repsPerSet = repsPerSet;
+        this.repsPerSet = new HashMap<>(repsPerSet); // Start empty or partially filled
         this.targetReps = targetReps;
         this.weight = weight;
         this.mode = mode;
 
         checkExerciseNameValid(name);
         checkExerciseSetsIsValid(sets);
-        checkExerciseRepsValid(repsPerSet);
         checkExerciseWeightValid(weight);
     }
 
@@ -74,89 +70,48 @@ public class Exercise implements IExercise {
      * @param name       the given name.
      * @param sets       the number of sets the exercise will be done for.
      * @param repsPerSet the repetitions of the exercise per set. Set number is the Key, repetitions is Value.
-     * @param weight     the  weight being used for the exercise.
+     * @param weight     the weight being used for the exercise.
      * @param mode       the mode of the exercise.
      * @return a new exercise, with the specified parameters.
      */
     @Override
-    public Exercise createExercise(String name, int sets, Map<Integer, Integer> repsPerSet,int targetReps, double weight, Mode mode) {
+    public Exercise createExercise(String name, int sets, Map<Integer, Integer> repsPerSet, int targetReps, double weight, Mode mode) {
         return new Exercise(name, sets, repsPerSet, targetReps, weight, mode);
     }
 
-    /**
-     * Deletes an exercise.
-     */
-    @Override
-    public void deleteExercise() {
-        this.isDeleted = true;
-    }
-
-    /**
-     * Assesses whether an exercise has been deleted.
-     *
-     * @return whether the exercise has been deleted.
-     */
-    @Override
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    /**
-     * Updates the weight being used on this exercise.
-     *
-     * @param weight the new weight.
-     */
     @Override
     public void updateWeight(double weight) {
         checkExerciseWeightValid(weight);
         this.weight = weight;
     }
 
-    /**
-     * Obtains the current weight of this exercise.
-     *
-     * @return the given weight.
-     */
     @Override
     public double getWeight() {
-        return this.weight;
+        return weight;
     }
 
-    /**
-     * Updates the amount of sets for this exercise.
-     *
-     * @param sets the new amount of sets.
-     */
     @Override
     public void updateSets(int sets) {
         checkExerciseSetsIsValid(sets);
         this.sets = sets;
     }
 
-    /**
-     * Gets the current number of sets for this exercise.
-     *
-     * @return the number of sets.
-     */
     @Override
     public int getSets() {
-        return this.sets;
+        return sets;
     }
 
     /**
-     * Updates the reps at a specified set.
+     * Updates the reps at a specified set dynamically.
      *
      * @param setIndex the set that will be updated.
      * @param reps     the number of reps to assign to the set.
      */
     @Override
     public void updateReps(int setIndex, int reps) {
-        checkUpdateRepsDifferent(getRepsForSpecificSet(setIndex), reps);
-        if (setIndex >= 0 && setIndex < sets) {
-            this.repsPerSet.put(setIndex, reps);
-        } else {
-            throw new IllegalArgumentException("Invalid set index");
-        }
+        validateSetIndex(setIndex);
+        checkUpdateRepsDifferent(repsPerSet.getOrDefault(setIndex, -1), reps);
+        repsPerSet.put(setIndex, reps);
     }
 
     /**
@@ -166,56 +121,32 @@ public class Exercise implements IExercise {
      */
     @Override
     public Map<Integer, Integer> getRepsForAllSets() {
-        return repsPerSet;
+        return Collections.unmodifiableMap(repsPerSet);
     }
 
     /**
      * Obtains the reps for the specified set.
      *
      * @param setIndex the specified set.
-     * @return the nuumber of reps.
+     * @return the number of reps.
      */
     @Override
     public Integer getRepsForSpecificSet(int setIndex) {
-        return this.repsPerSet.get(setIndex);
+        validateSetIndex(setIndex);
+        return repsPerSet.getOrDefault(setIndex, 0);
     }
 
-    /**
-     * Sets the mode of this exercise.
-     *
-     * @param mode the mode.
-     */
     @Override
     public void updateMode(Mode mode) {
         checkUpdateModeDifferent(getMode(), mode);
         this.mode = mode;
     }
 
-    /**
-     * Obtains the mode of this exercise.
-     *
-     * @return the exercise mode.
-     */
     @Override
     public Mode getMode() {
-        return this.mode;
+        return mode;
     }
 
-    /**
-     * Gets the name of this exercise.
-     *
-     * @return the name of the exercise.
-     */
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Updates the name of this exercise.
-     *
-     * @param name the new name.
-     */
     @Override
     public void updateName(String name) {
         checkExerciseNameValid(name);
@@ -223,17 +154,31 @@ public class Exercise implements IExercise {
     }
 
     @Override
-    public int getTargetReps(){
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int getTargetReps() {
         return targetReps;
     }
 
     @Override
-    public void updateTargetReps(int newTargetReps){
+    public void updateTargetReps(int newTargetReps) {
         this.targetReps = newTargetReps;
     }
 
+    /**
+     * Enhanced `printExercise` for better readability.
+     */
     @Override
-    public int hashcode(){
+    public void printExercise() {
+        System.out.println(this.getName() + " " + this.getSets() + "x" + this.getTargetReps() + "@" + this.getWeight() +
+                " (Reps per set: " + this.getRepsForAllSets() + ")");
+    }
+
+    @Override
+    public int hashcode() {
         int result = name.hashCode();
         result = 31 * result + Integer.hashCode(sets);
         result = 31 * result + Integer.hashCode(targetReps);
@@ -243,16 +188,13 @@ public class Exercise implements IExercise {
     }
 
     @Override
-    public boolean equals(Object object){
-
-        if(this == object){
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
-
-        if(object == null || getClass() != object.getClass()){
-            return  false;
+        if (object == null || getClass() != object.getClass()) {
+            return false;
         }
-
         Exercise other = (Exercise) object;
 
         return this.name.equals(other.name) &&
@@ -262,64 +204,48 @@ public class Exercise implements IExercise {
                 this.targetReps == other.targetReps;
     }
 
-    @Override
-    public void printExercise(){
-        System.out.println(this.getName() + " " + this.getSets() + "x" + this.getTargetReps() + "@" + this.getWeight());
-    }
-
     /**
-     * Verifies that the assigned name for an exercise is valid (cannot be empty).
-     *
-     * @param name the name of the exercise.
-     * @throws IllegalArgumentException if the name is invalid
+     * Validates the set index during rep updates.
      */
-    private void checkExerciseNameValid(String name) {
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("An exercise must have a name");
+    private void validateSetIndex(int setIndex) {
+        if (setIndex < 0 || setIndex >= sets) {
+            throw new IllegalArgumentException("Set index " + setIndex + " is out of bounds for " + sets + " sets.");
         }
     }
 
     /**
-     * Verifies that the assigned weight to an exercise is valid (cannot be negative).
-     *
-     * @param weight the weight of the exercise.
-     * @throws IllegalArgumentException if the  parameter is invalid.
-     */
-    private void checkExerciseWeightValid(double weight) {
-        if (weight < 0) {
-            throw new IllegalArgumentException("Weight cannot be negative");
-        }
-    }
-
-    /**
-     * Verifies that the reps on each set are valid (cannot be less than 0).
-     *
-     * @param repsPerSet the map where the reps per set are stored as a KV pair.
-     * @throws IllegalArgumentException if the value (reps) is less than 0.
-     */
-    private void checkExerciseRepsValid(Map<Integer, Integer> repsPerSet) {
-        for (Map.Entry<Integer, Integer> entries : repsPerSet.entrySet()) {
-            if (entries.getValue() < 0) {
-                throw new IllegalArgumentException("Reps cannot be less than 0 for any given set");
-            }
-        }
-    }
-
-    /**
-     * Verifies that the number of sets un an exercise is valid (not less than 1).
-     *
-     * @param sets the number of sets in the exercise.
-     * @throws IllegalArgumentException if the paramter is invalid.
+     * Verifies that the number of sets in an exercise is valid.
      */
     private void checkExerciseSetsIsValid(int sets) {
         if (sets < 1) {
-            throw new IllegalArgumentException("Number of sets cannot be less than 1");
+            throw new IllegalArgumentException("Number of sets (" + sets + ") cannot be less than 1.");
         }
     }
 
+    /**
+     * Verifies the name of the exercise is valid.
+     */
+    private void checkExerciseNameValid(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Exercise name cannot be null or empty.");
+        }
+    }
+
+    /**
+     * Verifies that the weight is valid.
+     */
+    private void checkExerciseWeightValid(double weight) {
+        if (weight < 0) {
+            throw new IllegalArgumentException("Weight (" + weight + ") cannot be negative.");
+        }
+    }
+
+    /**
+     * Ensures reps are actually different before updating.
+     */
     private void checkUpdateRepsDifferent(int currentReps, int newReps) {
         if (currentReps == newReps) {
-            throw new IllegalArgumentException("Rep number must be different in order to update");
+            throw new IllegalArgumentException("New reps (" + newReps + ") must be different from current reps (" + currentReps + ").");
         }
     }
 

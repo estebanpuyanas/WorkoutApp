@@ -30,12 +30,6 @@ public class Workout implements IWorkout {
     }
 
     @Override
-    public void deleteExercise(IExercise exercise) {
-        exercise.deleteExercise();
-        this.exerciseList.removeIf(IExercise::isDeleted);
-    }
-
-    @Override
     public void editExercise(IExercise previousExercise, IExercise newExercise) {
         checkExerciseEditIsDifferent(previousExercise, newExercise);
         int index = this.exerciseList.indexOf(previousExercise);

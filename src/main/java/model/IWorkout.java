@@ -7,8 +7,6 @@ public interface IWorkout {
 
     void removeExercise(IExercise exercise);
 
-    void deleteExercise(IExercise exercise);
-
     void editExercise(IExercise previousExercise, IExercise newExercise);
 
     void printWorkout();

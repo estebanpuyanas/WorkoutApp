@@ -9,24 +9,15 @@ import java.util.Map;
 public class ExerciseTest {
 
     @Test
-    public void createExerciseWorksOnValidInput() {
+    public void ExerciseGettersWorksOnValidInput() {
         Map<Integer, Integer> repsPerSet = new HashMap<>();
         Exercise newExercise = new Exercise("Shoulder Press", 4, repsPerSet,8,50.00, Mode.DUMBBELL);
-
 
         Assert.assertEquals(newExercise.getName(), "Shoulder Press");
         Assert.assertEquals(newExercise.getSets(), 4);
         Assert.assertEquals(newExercise.getMode(), Mode.DUMBBELL);
         Assert.assertEquals(newExercise.getWeight(), 50.00, 0.00);
-    }
-
-    @Test
-    public void getTargetRepsWorksOnValidInput(){
-
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        Exercise exercise = new Exercise("Shoulder Press", 4, repsPerSet,8,50.00, Mode.DUMBBELL);
-
-        Assert.assertEquals(8, exercise.getTargetReps());
+        Assert.assertEquals(8, newExercise.getTargetReps());
     }
 
     @Test
@@ -63,9 +54,10 @@ public class ExerciseTest {
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateName(""));
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateSets(-1));
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(0, 5));
-        Assert.assertThrows(NullPointerException.class, () -> newExercise.updateReps(-5, 5));
-        Assert.assertThrows(NullPointerException.class, () -> newExercise.updateReps(3, 5));
+        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(-5, 5)); //negative index fails
+        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(5, 5)); //index > sets fails
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateMode(Mode.DUMBBELL));
+        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateWeight(-65.00));
     }
 
     @Test
@@ -78,12 +70,19 @@ public class ExerciseTest {
     }
 
     @Test
+    public void equalOverrideWorksWithSameObject() {
+
+        Map<Integer, Integer> repsPerSet = new HashMap<>();
+        Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
+        Assert.assertTrue(e1.equals(e1));
+    }
+
+    @Test
     public void equalOverrideFailsWhenFalse(){
         Map<Integer, Integer> repsPerSet = new HashMap<>();
         Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
         Exercise e2 = new Exercise("Incline Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
 
         Assert.assertFalse((e1.equals(e2)));
-
     }
 }

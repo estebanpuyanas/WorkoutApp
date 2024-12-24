@@ -23,19 +23,6 @@ public interface IExercise {
      * @return a new exercise, with the specified parameters.
      */
     Exercise createExercise(String name, int sets, Map<Integer, Integer> repsPerSet, int targetReps, double weight, Mode mode);
-
-    /**
-     * Deletes an exercise.
-     */
-    void deleteExercise();
-
-    /**
-     * Assesses whether an exercise has been deleted.
-     *
-     * @return whether the exercise has been deleted.
-     */
-    boolean isDeleted();
-
     /**
      * Updates the weight being used on this exercise.
      *
