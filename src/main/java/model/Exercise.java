@@ -1,5 +1,6 @@
 package model;
 
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -173,8 +174,15 @@ public class Exercise implements IExercise {
      */
     @Override
     public void printExercise() {
-        System.out.println(this.getName() + " " + this.getSets() + "x" + this.getTargetReps() + "@" + this.getWeight() +
-                " (Reps per set: " + this.getRepsForAllSets() + ")");
+        // Ensure consistent formatting for the weight
+        DecimalFormat df = new DecimalFormat("0.00");
+        String formattedWeight = df.format(this.getWeight());
+
+        System.out.println(
+                this.getName() + " " +
+                        this.getSets() + "x" + this.getTargetReps() + "@" + formattedWeight +
+                        " (Reps per set: " + this.getRepsForAllSets() + ")"
+        );
     }
 
     @Override

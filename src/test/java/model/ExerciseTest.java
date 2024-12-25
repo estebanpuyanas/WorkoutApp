@@ -56,7 +56,7 @@ public class ExerciseTest {
         repsPerSet.put(2, 8);
         repsPerSet.put(3, 8);
 
-        Exercise exercise = new Exercise("Shoulder Press", 4, repsPerSet, 8, 50.0, Mode.DUMBBELL);
+        Exercise exercise = new Exercise("Shoulder Press", 4, repsPerSet, 8, 50.00, Mode.DUMBBELL);
 
         // Redirect System.out to a ByteArrayOutputStream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -67,7 +67,7 @@ public class ExerciseTest {
         // Reset System.out
         System.setOut(System.out);
 
-        String expectedOutput = "Shoulder Press 4x8@50.0 (Reps per set: {0=8, 1=8, 2=8, 3=8})\n";
+        String expectedOutput = "Shoulder Press 4x8@50.00 (Reps per set: {0=8, 1=8, 2=8, 3=8})\n";
         Assert.assertEquals(expectedOutput, outputStream.toString());
     }
 
@@ -75,7 +75,7 @@ public class ExerciseTest {
     public void printExerciseHandlesEmptyRepsPerSet() {
 
         Map<Integer, Integer> repsPerSet = new HashMap<>();
-        Exercise exercise = new Exercise("Bicep Curl", 4, repsPerSet, 12, 25.0, Mode.BARBELL);
+        Exercise exercise = new Exercise("Bicep Curl", 4, repsPerSet, 12, 25.00, Mode.BARBELL);
 
         // Redirect System.out to a ByteArrayOutputStream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -86,7 +86,7 @@ public class ExerciseTest {
         // Reset System.out
         System.setOut(System.out);
 
-        String expectedOutput = "Bicep Curl 4x12@25.0 (Reps per set: {})\n";
+        String expectedOutput = "Bicep Curl 4x12@25.00 (Reps per set: {})\n";
         Assert.assertEquals(expectedOutput, outputStream.toString());
     }
 

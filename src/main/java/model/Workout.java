@@ -78,18 +78,17 @@ public class Workout implements IWorkout {
     @Override
     public void printWorkout() {
         if (currentExercises.isEmpty()) {
-            System.out.println(name + ":\nNo exercises in this workout.");
+            System.out.println("\n" + name + ":\nNo exercises in this workout.");
             return;
         }
 
-        System.out.println(name + ":\n");
-        int count = 1;
-        for (IExercise exercise : currentExercises) {
-            System.out.print(count + ". ");
-            exercise.printExercise();
-            count++;
+        System.out.println("\n" + name + ":");
+        for (int i = 0; i < currentExercises.size(); i++) {
+            System.out.print((i + 1) + ". ");
+            currentExercises.get(i).printExercise(); // Delegate printing to `printExercise`
         }
     }
+
 
     @Override
     public String getWorkoutName() {
@@ -98,6 +97,11 @@ public class Workout implements IWorkout {
 
     @Override
     public void setWorkoutName(String newName) {
+
+        if(newName == null || newName.isEmpty()) {
+            throw new IllegalArgumentException("Workout name cannot be null or empty stirng. Please choose a valid name");
+        }
+
         System.out.println("Workout name changed from \"" + this.name + "\" to \"" + newName + "\".");
         this.name = newName;
     }
