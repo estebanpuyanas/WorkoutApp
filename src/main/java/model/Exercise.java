@@ -54,7 +54,7 @@ public class Exercise implements IExercise {
     public Exercise(String name, int sets, Map<Integer, Integer> repsPerSet, int targetReps, double weight, Mode mode) {
         this.name = name;
         this.sets = sets;
-        this.repsPerSet = new HashMap<>(repsPerSet); // Start empty or partially filled
+        this.repsPerSet = new HashMap<>(repsPerSet);
         this.targetReps = targetReps;
         this.weight = weight;
         this.mode = mode;

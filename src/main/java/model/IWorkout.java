@@ -9,7 +9,13 @@ public interface IWorkout {
 
     void editExercise(IExercise previousExercise, IExercise newExercise);
 
+   void restoreExercise(IExercise exercise);
+
     void printWorkout();
+
+    String getWorkoutName();
+
+    void setWorkoutName(String newName);
 
     List<IExercise> getExerciseList();
 }
