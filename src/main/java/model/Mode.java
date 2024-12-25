@@ -4,5 +4,6 @@ public enum Mode {
     MACHINE,
     DUMBBELL,
     BARBELL,
-    CABLE
+    CABLE,
+    BODYWEIGHT
 }
