@@ -15,10 +15,10 @@ public class Workout implements IWorkout {
     private String name;
 
     // a list to hold the current/active exercises of the workout.
-    private List<IExercise> currentExercises;
+    private final List<IExercise> currentExercises;
 
     // a list to hold the inactive/deleted exercises of the workout.
-    private List<IExercise> deletedExercises;
+    private final List<IExercise> deletedExercises;
 
     // Default workout constructor.
     public Workout(String name) {
@@ -159,6 +159,7 @@ public class Workout implements IWorkout {
         return this.currentExercises;
     }
 
+
     /**
      * Obtains the current list of deleted exercises as an unmodifiable list.
      * @return the current list of deleted exercises.
@@ -174,6 +175,33 @@ public class Workout implements IWorkout {
     public List<IExercise> getCurrentExercises() {
         return Collections.unmodifiableList(currentExercises);
     }
+
+    @Override
+    public boolean equals(Object object) {
+        //TODO WRITE TESTS FOR METHOD
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        Workout other = (Workout) object;
+
+        // Compare name, current exercises, and deleted exercises for equality
+        return name.equals(other.name) &&
+                currentExercises.equals(other.currentExercises) &&
+                deletedExercises.equals(other.deletedExercises);
+    }
+
+    @Override
+    public int hashCode() {
+        //TODO WRITE TESTS FOR METHOD
+        int result = name.hashCode();
+        result = 31 * result + currentExercises.hashCode();
+        result = 31 * result + deletedExercises.hashCode();
+        return result;
+    }
+
 
     // Private helper methods.
 

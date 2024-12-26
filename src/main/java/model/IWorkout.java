@@ -56,4 +56,8 @@ public interface IWorkout {
      * @return the exercises of this workout, as a list.
      */
     List<IExercise> getExerciseList();
+
+    int hashcode();
+
+    boolean equals(Object object);
 }
