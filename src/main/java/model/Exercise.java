@@ -31,6 +31,9 @@ public class Exercise implements IExercise {
      */
     private final Map<Integer, Integer> repsPerSet;
 
+    /**
+     * the target amount of repetitions desired to be achived in a set.
+     */
     private int targetReps;
 
     /**
@@ -49,6 +52,7 @@ public class Exercise implements IExercise {
      * @param name       the name of the exercise.
      * @param sets       the sets of the exercise.
      * @param repsPerSet the reps done per each set of the exercise.
+     * @param targetReps the target amount of repetitions desired to be achived in a set.
      * @param weight     the weight of the exercise.
      * @param mode       the mode of the exercise.
      */
@@ -71,6 +75,7 @@ public class Exercise implements IExercise {
      * @param name       the given name.
      * @param sets       the number of sets the exercise will be done for.
      * @param repsPerSet the repetitions of the exercise per set. Set number is the Key, repetitions is Value.
+     * @param targetReps the target amount of repetitions desired to be achived in a set.
      * @param weight     the weight being used for the exercise.
      * @param mode       the mode of the exercise.
      * @return a new exercise, with the specified parameters.
@@ -80,23 +85,43 @@ public class Exercise implements IExercise {
         return new Exercise(name, sets, repsPerSet, targetReps, weight, mode);
     }
 
+    /**
+     * Updates the weight being used on this exercise.
+     *
+     * @param weight the new weight.
+     */
     @Override
     public void updateWeight(double weight) {
         checkExerciseWeightValid(weight);
         this.weight = weight;
     }
 
+    /**
+     * Obtains the current weight of this exercise.
+     *
+     * @return the given weight.
+     */
     @Override
     public double getWeight() {
         return weight;
     }
 
+    /**
+     * Updates the amount of sets for this exercise.
+     *
+     * @param sets the new amount of sets.
+     */
     @Override
     public void updateSets(int sets) {
         checkExerciseSetsIsValid(sets);
         this.sets = sets;
     }
 
+    /**
+     * Gets the current number of sets for this exercise.
+     *
+     * @return the number of sets.
+     */
     @Override
     public int getSets() {
         return sets;
@@ -137,40 +162,73 @@ public class Exercise implements IExercise {
         return repsPerSet.getOrDefault(setIndex, 0);
     }
 
+    /**
+     * Sets the mode of this exercise.
+     *
+     * @param mode the mode.
+     */
     @Override
     public void updateMode(Mode mode) {
         checkUpdateModeDifferent(getMode(), mode);
         this.mode = mode;
     }
 
+    /**
+     * Obtains the mode of this exercise.
+     *
+     * @return the exercise mode.
+     */
     @Override
     public Mode getMode() {
         return mode;
     }
 
+    /**
+     * Updates the name of this exercise.
+     *
+     * @param name the new name.
+     */
     @Override
     public void updateName(String name) {
         checkExerciseNameValid(name);
         this.name = name;
     }
 
+    /**
+     * Gets the name of this exercise.
+     *
+     * @return the name of the exercise.
+     */
     @Override
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets the target reps of this exercise.
+     * @return the given exercise's target reps.
+     */
     @Override
     public int getTargetReps() {
         return targetReps;
     }
 
+    /**
+     * Updates the target repetitions of this exercise.
+     * @param newTargetReps the new number of target reps.
+     */
     @Override
     public void updateTargetReps(int newTargetReps) {
-        this.targetReps = newTargetReps;
+        if(newTargetReps == this.targetReps){
+            throw new IllegalArgumentException("New target reps must be different from current target reps");
+        } else {
+            this.targetReps = newTargetReps;
+        }
     }
 
     /**
-     * Enhanced `printExercise` for better readability.
+     * Prints the current exercise in the following format:
+     * ExerciseName sets X targetReps @ weight.
      */
     @Override
     public void printExercise() {
@@ -185,6 +243,10 @@ public class Exercise implements IExercise {
         );
     }
 
+    /**
+     * Overriden default hashcode method.
+     * @return the hashcode of an objet.
+     */
     @Override
     public int hashcode() {
         int result = name.hashCode();
@@ -195,6 +257,12 @@ public class Exercise implements IExercise {
         return result;
     }
 
+    /**
+     * Overriden default equals method.
+     * @param object the object to compare equality against.
+     * @return true if this and object are the same; false if object is null or an object of different class;
+     * true if all fields if this and other object are the same
+     */
     @Override
     public boolean equals(Object object) {
         if (this == object) {
@@ -257,6 +325,11 @@ public class Exercise implements IExercise {
         }
     }
 
+    /**
+     * Ensures that when updating mode, the current mode and new mode are different.
+     * @param currentMode the currnet mode of the exercise.
+     * @param newMode the new mode of the exercise.
+     */
     private void checkUpdateModeDifferent(Mode currentMode, Mode newMode) {
         if (currentMode == newMode) {
             throw new IllegalArgumentException("Modes must be different for mode updating to work");

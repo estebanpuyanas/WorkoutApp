@@ -11,8 +11,10 @@ import java.util.Map;
 
 public class WorkoutTest {
 
+    // Private workout field created to be accessible by all methods (tests in the class).
     private Workout testWorkout;
 
+    // Create factory setup method to reduce code duplication.
     @Before
     public void setup() {
 
@@ -207,6 +209,29 @@ public class WorkoutTest {
     }
 
     @Test
+    public void restoreExerciseWorksOnValidInput() {
+        // Setup
+        Workout workout = new Workout("Test Workout");
+        Map<Integer, Integer> repsPerSet = new HashMap<>();
+        IExercise exercise = new Exercise("Bench Press", 4, repsPerSet, 12, 65.00, Mode.DUMBBELL);
+
+        // Add exercise to currentExercises list
+        workout.addExercise(exercise);
+
+        // Remove exercise (moves it to deletedExercises list)
+        workout.removeExercise(exercise);
+
+        // Call restoreExercise (moves it back to currentExercises list)
+        workout.restoreExercise(exercise);
+
+        // Assertions
+        Assert.assertTrue("Exercise should be in currentExercises after restoration.",
+                workout.getCurrentExercises().contains(exercise));
+        Assert.assertFalse("Exercise should be removed from deletedExercises after restoration.",
+                workout.getDeletedExercises().contains(exercise));
+    }
+
+    @Test
     public void getNameWorks() {
         String expected = "Test Workout";
         Assert.assertEquals(expected, testWorkout.getWorkoutName());
@@ -240,7 +265,6 @@ public class WorkoutTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        // Act
         testWorkout.printWorkout();
 
         // Reset System.out to its original state
@@ -256,5 +280,31 @@ public class WorkoutTest {
 
         Assert.assertEquals(expectedOutput.trim(), outputStream.toString().trim());
     }
+
+    @Test
+    public void printWorkoutHandlesEmptyWorkout() {
+
+        Workout workout = new Workout("Empty Workout");
+
+        // Capture the output stream
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+
+        try {
+            // Call printWorkout
+            workout.printWorkout();
+
+            // Assert output
+            String expectedOutput = "\nEmpty Workout:\nNo exercises in this workout.\n";
+            Assert.assertEquals("The output for an empty workout is not as expected.", expectedOutput, outputStream.toString());
+            // The finally keyword is used in try-catch block and guarantees a section of code will be executed even if exception is thrown
+            // This is useful for this test because since we want to capture the thrown exception it is still necessary to reset the printStream.
+        } finally {
+            // Restore the original System.out
+            System.setOut(originalOut);
+        }
+    }
+
 
 }

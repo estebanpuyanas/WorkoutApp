@@ -101,6 +101,7 @@ public class ExerciseTest {
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(0, 5));
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(-5, 5)); //negative index fails
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(5, 5)); //index > sets fails
+        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateTargetReps(8));
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateMode(Mode.DUMBBELL));
         Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateWeight(-65.00));
     }
