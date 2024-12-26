@@ -11,13 +11,13 @@ import java.util.Collections;
  */
 public class Workout implements IWorkout {
 
-    // the name of  the workout.
+    // the name of the workout.
     private String name;
 
     // a list to hold the current/active exercises of the workout.
     private List<IExercise> currentExercises;
 
-   // a list to hold the inactive/deleted exercises of the workout.
+    // a list to hold the inactive/deleted exercises of the workout.
     private List<IExercise> deletedExercises;
 
     // Default workout constructor.
@@ -62,6 +62,7 @@ public class Workout implements IWorkout {
             currentExercises.remove(exercise);
             deletedExercises.add(exercise);
             System.out.println("Exercise \"" + exercise.getName() + "\" removed from workout \"" + name + "\".");
+            validateWorkoutHasAtLeastOneExercise(); // Validate after removal
         } else {
             throw new IllegalArgumentException("The exercise \"" + exercise.getName() + "\" does not exist in the current exercises list of workout \"" + name + "\".");
         }
@@ -125,7 +126,6 @@ public class Workout implements IWorkout {
         }
     }
 
-
     /**
      * Gets the current name of this workout.
      * @return this workout's name.
@@ -175,7 +175,7 @@ public class Workout implements IWorkout {
         return Collections.unmodifiableList(currentExercises);
     }
 
-    //Private helper methods.
+    // Private helper methods.
 
     /**
      * Verifies that an edited exercise is different that its current version.
@@ -202,11 +202,20 @@ public class Workout implements IWorkout {
 
     /**
      * Verifies that no null exercises can be passed into the system
-     * @param exercise th exercise to check.
+     * @param exercise the exercise to check.
      */
     private void checkExerciseIsNotNull(IExercise exercise) {
         if (exercise == null) {
             throw new IllegalArgumentException("Cannot add or modify a null exercise in workout \"" + name + "\".");
+        }
+    }
+
+    /**
+     * Validates that the workout contains at least one exercise.
+     */
+    private void validateWorkoutHasAtLeastOneExercise() {
+        if (currentExercises.isEmpty()) {
+            throw new IllegalStateException("A workout must contain at least one exercise.");
         }
     }
 }

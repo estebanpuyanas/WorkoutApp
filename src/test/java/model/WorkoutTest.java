@@ -42,6 +42,27 @@ public class WorkoutTest {
     }
 
     @Test
+    public void workoutWorksWithAtLeastOneExercise() {
+        Assert.assertFalse("The workout should have at least one exercise.", testWorkout.getExerciseList().isEmpty());
+    }
+
+    @Test
+    public void workoutThrowsExceptionWhenLessThanOneExercise() {
+        Workout emptyWorkout = new Workout("Empty Workout Test");
+        Map<Integer, Integer> repsPerSet = new HashMap<>();
+
+
+        Exercise e1 = new Exercise("Bench press",4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
+        Exercise e2 = new Exercise("Shoulder press",4, repsPerSet, 8, 50.00, Mode.DUMBBELL);
+
+        emptyWorkout.addExercise(e1);
+        emptyWorkout.addExercise(e2);
+
+        emptyWorkout.removeExercise(e1);
+        Assert.assertThrows(IllegalStateException.class, () -> emptyWorkout.removeExercise(e2));
+    }
+
+    @Test
     public void addExerciseToWorkoutFunctionsOnValidInput() {
 
         Map<Integer, Integer> shoulderPressReps = new HashMap<>();
@@ -213,22 +234,24 @@ public class WorkoutTest {
         // Setup
         Workout workout = new Workout("Test Workout");
         Map<Integer, Integer> repsPerSet = new HashMap<>();
-        IExercise exercise = new Exercise("Bench Press", 4, repsPerSet, 12, 65.00, Mode.DUMBBELL);
+        IExercise exercise1 = new Exercise("Bench Press", 4, repsPerSet, 12, 65.00, Mode.DUMBBELL);
+        IExercise exercise2 = new Exercise("Shoulder Press", 4, repsPerSet, 12, 50.00, Mode.DUMBBELL);
+        workout.addExercise(exercise2);
 
         // Add exercise to currentExercises list
-        workout.addExercise(exercise);
+        workout.addExercise(exercise1);
 
         // Remove exercise (moves it to deletedExercises list)
-        workout.removeExercise(exercise);
+        workout.removeExercise(exercise1);
 
         // Call restoreExercise (moves it back to currentExercises list)
-        workout.restoreExercise(exercise);
+        workout.restoreExercise(exercise1);
 
         // Assertions
         Assert.assertTrue("Exercise should be in currentExercises after restoration.",
-                workout.getCurrentExercises().contains(exercise));
+                workout.getCurrentExercises().contains(exercise1));
         Assert.assertFalse("Exercise should be removed from deletedExercises after restoration.",
-                workout.getDeletedExercises().contains(exercise));
+                workout.getDeletedExercises().contains(exercise1));
     }
 
     @Test
