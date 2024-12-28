@@ -2,7 +2,7 @@ package model;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -27,12 +27,13 @@ public class Exercise implements IExercise {
     private int sets;
 
     /**
-     * Data structure that stores the sets:reps as KV pair in map.
+     * Data structure that stores the sets:reps as KV pair in a LinkedHashMap.
+     * The LinkedHashMap preserves the order of insertion, ensuring consistent hashCode.
      */
     private final Map<Integer, Integer> repsPerSet;
 
     /**
-     * the target amount of repetitions desired to be achived in a set.
+     * The target amount of repetitions desired to be achieved in a set.
      */
     private int targetReps;
 
@@ -52,14 +53,14 @@ public class Exercise implements IExercise {
      * @param name       the name of the exercise.
      * @param sets       the sets of the exercise.
      * @param repsPerSet the reps done per each set of the exercise.
-     * @param targetReps the target amount of repetitions desired to be achived in a set.
+     * @param targetReps the target amount of repetitions desired to be achieved in a set.
      * @param weight     the weight of the exercise.
      * @param mode       the mode of the exercise.
      */
     public Exercise(String name, int sets, Map<Integer, Integer> repsPerSet, int targetReps, double weight, Mode mode) {
         this.name = name;
         this.sets = sets;
-        this.repsPerSet = new HashMap<>(repsPerSet);
+        this.repsPerSet = new LinkedHashMap<>(repsPerSet); // Use LinkedHashMap for consistent ordering
         this.targetReps = targetReps;
         this.weight = weight;
         this.mode = mode;
@@ -75,7 +76,7 @@ public class Exercise implements IExercise {
      * @param name       the given name.
      * @param sets       the number of sets the exercise will be done for.
      * @param repsPerSet the repetitions of the exercise per set. Set number is the Key, repetitions is Value.
-     * @param targetReps the target amount of repetitions desired to be achived in a set.
+     * @param targetReps the target amount of repetitions desired to be achieved in a set.
      * @param weight     the weight being used for the exercise.
      * @param mode       the mode of the exercise.
      * @return a new exercise, with the specified parameters.
@@ -244,8 +245,9 @@ public class Exercise implements IExercise {
     }
 
     /**
-     * Overriden default hashcode method.
-     * @return the hashcode of an objet.
+     * Overridden hashCode method to ensure consistent hashing for Exercise objects.
+     *
+     * @return the hashCode of an object.
      */
     @Override
     public int hashcode() {
@@ -254,11 +256,13 @@ public class Exercise implements IExercise {
         result = 31 * result + Integer.hashCode(targetReps);
         result = 31 * result + Double.hashCode(weight);
         result = 31 * result + (mode != null ? mode.hashCode() : 0);
+        result = 31 * result + repsPerSet.hashCode(); // Include repsPerSet in hashCode
         return result;
     }
 
     /**
-     * Overriden default equals method.
+     * Overridden equals method to ensure object equality for Exercise objects.
+     *
      * @param object the object to compare equality against.
      * @return true if this and object are the same; false if object is null or an object of different class;
      * true if all fields if this and other object are the same
@@ -277,7 +281,8 @@ public class Exercise implements IExercise {
                 this.mode.equals(other.mode) &&
                 Double.compare(this.weight, other.weight) == 0 &&
                 this.sets == other.sets &&
-                this.targetReps == other.targetReps;
+                this.targetReps == other.targetReps &&
+                this.repsPerSet.equals(other.repsPerSet); // Compare repsPerSet
     }
 
     /**

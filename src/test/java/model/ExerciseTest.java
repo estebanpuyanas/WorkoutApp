@@ -113,6 +113,7 @@ public class ExerciseTest {
         Exercise e2 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
 
         Assert.assertTrue(e1.equals(e2));
+        Assert.assertEquals(e1.hashcode(), e2.hashcode());
     }
 
     @Test
@@ -130,6 +131,7 @@ public class ExerciseTest {
         Exercise e2 = new Exercise("Incline Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
 
         Assert.assertFalse((e1.equals(e2)));
+        Assert.assertNotEquals(e1.hashcode(), e2.hashcode());
     }
 
     @Test

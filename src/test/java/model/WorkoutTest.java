@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WorkoutTest {
@@ -329,5 +330,119 @@ public class WorkoutTest {
         }
     }
 
+    @Test
+    public void equalsWorksOnIdenticalWorkOuts() {
 
+        // Create same workout as in @before setup method.
+        Workout identicalWorkout = new Workout("Test Workout");
+
+        Map<Integer, Integer> benchReps = new HashMap<>();
+        benchReps.put(0, 10);
+        benchReps.put(1, 10);
+        benchReps.put(2, 8);
+        identicalWorkout.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL));
+
+        Map<Integer, Integer> squatReps = new HashMap<>();
+        squatReps.put(0, 12);
+        squatReps.put(1, 10);
+        squatReps.put(2, 10);
+        identicalWorkout.addExercise(new Exercise("Squat", 3, squatReps, 12, 185.00, Mode.BARBELL));
+
+        Map<Integer, Integer> pullupReps = new HashMap<>();
+        pullupReps.put(0, 15);
+        pullupReps.put(1, 12);
+        pullupReps.put(2, 12);
+        identicalWorkout.addExercise(new Exercise("Pull-ups", 3, pullupReps, 15, 0.00, Mode.BODYWEIGHT));
+
+        debugWorkoutEquality(testWorkout, identicalWorkout);
+
+        Assert.assertEquals(testWorkout, identicalWorkout);
+        Assert.assertEquals(testWorkout.hashcode(), identicalWorkout.hashcode());
+    }
+
+    private void debugWorkoutEquality(Workout w1, Workout w2) {
+        System.out.println("Comparing workouts...");
+        System.out.println("Workout Names: " + w1.getWorkoutName() + " vs. " + w2.getWorkoutName());
+
+        System.out.println("Workout Exercises:");
+        List<IExercise> w1Exercises = w1.getExerciseList();
+        List<IExercise> w2Exercises = w2.getExerciseList();
+
+        System.out.println("Test Workout Exercises:");
+        for (IExercise ex : w1Exercises) {
+            System.out.println("  " + ex.getName() + ", hashCode: " + ex.hashCode() + ", repsPerSet: " + ex.getRepsForAllSets().hashCode());
+        }
+
+        System.out.println("Identical Workout Exercises:");
+        for (IExercise ex : w2Exercises) {
+            System.out.println("  " + ex.getName() + ", hashCode: " + ex.hashCode() + ", repsPerSet: " + ex.getRepsForAllSets().hashCode());
+        }
+
+        System.out.println("Exercise List Equality: " + w1Exercises.equals(w2Exercises));
+        System.out.println("Workout hashCodes: " + w1.hashCode() + " vs. " + w2.hashCode());
+    }
+
+    @Test
+    public void equalsFailsOnDifferentNamedWorkouts() {
+
+        Workout differentWorkout = new Workout("Different Workout");
+
+        Map<Integer, Integer> benchReps = new HashMap<>();
+        benchReps.put(0, 10);
+        benchReps.put(1, 10);
+        benchReps.put(2, 8);
+        differentWorkout.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL));
+
+        Map<Integer, Integer> squatReps = new HashMap<>();
+        squatReps.put(0, 12);
+        squatReps.put(1, 10);
+        squatReps.put(2, 10);
+        differentWorkout.addExercise(new Exercise("Squat", 3, squatReps, 12, 185.00, Mode.BARBELL));
+
+        Map<Integer, Integer> pullupReps = new HashMap<>();
+        pullupReps.put(0, 15);
+        pullupReps.put(1, 12);
+        pullupReps.put(2, 12);
+        differentWorkout.addExercise(new Exercise("Pull-ups", 3, pullupReps, 15, 0.00, Mode.BODYWEIGHT));
+
+        Assert.assertNotEquals(testWorkout, differentWorkout);
+    }
+
+    @Test
+    public void equalsFailsOnDifferentExerciseWorkouts() {
+
+        Workout differentExercisesWorkout = new Workout("Test Workout");
+
+        Map<Integer, Integer> deadliftReps = new HashMap<>();
+        deadliftReps.put(0, 10);
+        deadliftReps.put(1, 10);
+        deadliftReps.put(2, 10);
+        differentExercisesWorkout.addExercise(new Exercise("Deadlift", 3, deadliftReps, 10, 225.00, Mode.BARBELL));
+
+        Assert.assertNotEquals(testWorkout, differentExercisesWorkout);
+    }
+
+    // two workouts will not have the same hashcode if their contents is not the same.
+    @Test
+    public void workoutsHashCodeDiffersWithContent() {
+
+        // Same name as @before seup method workout
+        Workout differentWorkout = new Workout("Test Workout");
+
+        // Add different exercises
+        Map<Integer, Integer> deadliftReps = new HashMap<>();
+        deadliftReps.put(0, 10);
+        deadliftReps.put(1, 10);
+        deadliftReps.put(2, 10);
+        differentWorkout.addExercise(new Exercise("Deadlift", 3, deadliftReps, 10, 225.00, Mode.BARBELL));
+
+        Assert.assertNotEquals(testWorkout.hashCode(), differentWorkout.hashCode());
+    }
+
+    @Test
+    public void workoutEqualsFailsWhenComparedToNullOrDifferentType() {
+
+        Assert.assertNotEquals(testWorkout, null);
+        Assert.assertNotEquals(testWorkout, new Object());
+    }
 }

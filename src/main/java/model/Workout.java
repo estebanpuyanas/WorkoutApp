@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Collections;
 
@@ -177,8 +178,17 @@ public class Workout implements IWorkout {
     }
 
     @Override
+    public int hashcode() {
+        int result = name.hashCode();
+        // Use a sorted copy of currentExercises to ensure consistent ordering
+        List<IExercise> sortedExercises = new ArrayList<>(currentExercises);
+        sortedExercises.sort(Comparator.comparing(IExercise::getName)); // Sort by name or other unique identifier
+        result = 31 * result + sortedExercises.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object object) {
-        //TODO WRITE TESTS FOR METHOD
         if (this == object) {
             return true;
         }
@@ -187,21 +197,19 @@ public class Workout implements IWorkout {
         }
         Workout other = (Workout) object;
 
-        // Compare name, current exercises, and deleted exercises for equality
-        return name.equals(other.name) &&
-                currentExercises.equals(other.currentExercises) &&
-                deletedExercises.equals(other.deletedExercises);
-    }
+        // Compare the name
+        if (!name.equals(other.name)) {
+            return false;
+        }
 
-    @Override
-    public int hashCode() {
-        //TODO WRITE TESTS FOR METHOD
-        int result = name.hashCode();
-        result = 31 * result + currentExercises.hashCode();
-        result = 31 * result + deletedExercises.hashCode();
-        return result;
-    }
+        // Compare exercises in sorted order
+        List<IExercise> thisSortedExercises = new ArrayList<>(this.currentExercises);
+        List<IExercise> otherSortedExercises = new ArrayList<>(other.currentExercises);
+        thisSortedExercises.sort(Comparator.comparing(IExercise::getName));
+        otherSortedExercises.sort(Comparator.comparing(IExercise::getName));
 
+        return thisSortedExercises.equals(otherSortedExercises);
+    }
 
     // Private helper methods.
 
