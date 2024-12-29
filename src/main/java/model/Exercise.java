@@ -104,7 +104,7 @@ public class Exercise implements IExercise {
      */
     @Override
     public double getWeight() {
-        return weight;
+        return this.weight;
     }
 
     /**
@@ -125,7 +125,7 @@ public class Exercise implements IExercise {
      */
     @Override
     public int getSets() {
-        return sets;
+        return this.sets;
     }
 
     /**
@@ -181,7 +181,7 @@ public class Exercise implements IExercise {
      */
     @Override
     public Mode getMode() {
-        return mode;
+        return this.mode;
     }
 
     /**
@@ -202,7 +202,7 @@ public class Exercise implements IExercise {
      */
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -211,7 +211,7 @@ public class Exercise implements IExercise {
      */
     @Override
     public int getTargetReps() {
-        return targetReps;
+        return this.targetReps;
     }
 
     /**

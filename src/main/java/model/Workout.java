@@ -180,10 +180,9 @@ public class Workout implements IWorkout {
     @Override
     public int hashcode() {
         int result = name.hashCode();
-        // Use a sorted copy of currentExercises to ensure consistent ordering
-        List<IExercise> sortedExercises = new ArrayList<>(currentExercises);
-        sortedExercises.sort(Comparator.comparing(IExercise::getName)); // Sort by name or other unique identifier
-        result = 31 * result + sortedExercises.hashCode();
+        for (IExercise exercise : currentExercises) {
+            result = 31 * result + exercise.hashCode(); // Leverage Exercise.hashCode()
+        }
         return result;
     }
 
@@ -197,18 +196,13 @@ public class Workout implements IWorkout {
         }
         Workout other = (Workout) object;
 
-        // Compare the name
+        // Compare workout name
         if (!name.equals(other.name)) {
             return false;
         }
 
-        // Compare exercises in sorted order
-        List<IExercise> thisSortedExercises = new ArrayList<>(this.currentExercises);
-        List<IExercise> otherSortedExercises = new ArrayList<>(other.currentExercises);
-        thisSortedExercises.sort(Comparator.comparing(IExercise::getName));
-        otherSortedExercises.sort(Comparator.comparing(IExercise::getName));
-
-        return thisSortedExercises.equals(otherSortedExercises);
+        // Compare exercises (list equality checks both order and content)
+        return currentExercises.equals(other.currentExercises);
     }
 
     // Private helper methods.
