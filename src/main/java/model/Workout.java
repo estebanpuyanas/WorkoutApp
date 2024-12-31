@@ -180,29 +180,19 @@ public class Workout implements IWorkout {
     @Override
     public int hashcode() {
         int result = name.hashCode();
-        for (IExercise exercise : currentExercises) {
-            result = 31 * result + exercise.hashCode(); // Leverage Exercise.hashCode()
+        for (IExercise exercise : getCurrentExercises()) {
+            result = 31 * result + exercise.hashcode(); // Leverage Exercise.hashCode()
         }
         return result;
     }
 
     @Override
     public boolean equals(Object object) {
-        if (this == object) {
-            return true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
         Workout other = (Workout) object;
+        return this.name.equals(other.name) && this.getCurrentExercises().equals(other.getCurrentExercises());
 
-        // Compare workout name
-        if (!name.equals(other.name)) {
-            return false;
-        }
-
-        // Compare exercises (list equality checks both order and content)
-        return currentExercises.equals(other.currentExercises);
     }
 
     // Private helper methods.

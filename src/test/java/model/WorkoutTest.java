@@ -313,9 +313,9 @@ public class WorkoutTest {
         // Assert
         String expectedOutput = """
         Test Workout:
-        1. Bench Press 3x10@65.00 (Reps per set: {0=10, 1=10, 2=8})
-        2. Squat 3x12@185.00 (Reps per set: {0=12, 1=10, 2=10})
-        3. Pull-ups 3x15@0.00 (Reps per set: {0=15, 1=12, 2=12})
+        1. Bench Press 3x10@65.00 (Reps per set: [Set 1: 10, Set 2: 10, Set 3: 8])
+        2. Squat 3x12@185.00 (Reps per set: [Set 1: 12, Set 2: 10, Set 3: 10])
+        3. Pull-ups 3x15@0.00 (Reps per set: [Set 1: 15, Set 2: 12, Set 3: 12])
         """;
 
         Assert.assertEquals(expectedOutput.trim(), outputStream.toString().trim());
@@ -349,8 +349,8 @@ public class WorkoutTest {
     @Test
     public void equalsWorksOnIdenticalWorkOuts() {
 
-        // Create same workout as in @before setup method.
-        Workout identicalWorkout = new Workout("Test Workout");
+        Workout w1 = new Workout("Test Workout");
+        Workout w2 = new Workout("Test Workout");
 
         // Create reps list for exercises
         List<SetReps> benchReps = new ArrayList<>();
@@ -368,14 +368,17 @@ public class WorkoutTest {
         pullupReps.add(new SetReps(2, 12));
         pullupReps.add(new SetReps(3, 12));
 
-        // Add exercises to identicalWorkout
-        identicalWorkout.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL));
-        identicalWorkout.addExercise(new Exercise("Squat", 3, squatReps, 12, 185.00, Mode.BARBELL));
-        identicalWorkout.addExercise(new Exercise("Pull-ups", 3, pullupReps, 15, 0.00, Mode.BODYWEIGHT));
+        w1.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL));
+        w1.addExercise(new Exercise("Squat", 3, squatReps, 12, 185.00, Mode.BARBELL));
+        w1.addExercise(new Exercise("Pull-ups", 3, pullupReps, 15, 0.00, Mode.BODYWEIGHT));
+
+        w2.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL));
+        w2.addExercise(new Exercise("Squat", 3, squatReps, 12, 185.00, Mode.BARBELL));
+        w2.addExercise(new Exercise("Pull-ups", 3, pullupReps, 15, 0.00, Mode.BODYWEIGHT));
 
         // Assertions
-        Assert.assertEquals(testWorkout, identicalWorkout);
-        Assert.assertEquals(testWorkout.hashcode(), identicalWorkout.hashcode());
+        Assert.assertEquals(w1, w2);
+        Assert.assertEquals(w1.hashcode(), w2.hashcode());
     }
 
     @Test
