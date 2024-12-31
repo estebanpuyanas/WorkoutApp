@@ -9,7 +9,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ExerciseTest {
 
@@ -71,7 +70,7 @@ public class ExerciseTest {
         // Reset System.out
         System.setOut(System.out);
 
-        String expectedOutput = "Shoulder Press 4x8@50.00 (Reps per set: {0=8, 1=8, 2=8, 3=8})\n";
+        String expectedOutput = "Shoulder Press 4x8@50.00 (Reps per set: [Set 1: 8, Set 2: 8, Set 3: 8, Set 4: 8])\n";
         Assert.assertEquals(expectedOutput, outputStream.toString());
     }
 
@@ -99,7 +98,7 @@ public class ExerciseTest {
 
         Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateName(""));
         Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateSets(-1));
-        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateReps(0, 5));
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateReps(1, 8));
         Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateReps(-5, 5)); //negative index fails
         Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateReps(5, 5)); //index > sets fails
         Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateTargetReps(8));
@@ -110,20 +109,21 @@ public class ExerciseTest {
     @Test
     public void equalOverrideWorksWhenTrue() {
 
-        // Create a new exercise that is the same as in @before setup method.
-        IExercise testExercise2;
+        List<SetReps> setReps = new ArrayList<>();
 
-        defaultRepsPerSet = new ArrayList<>();
-        defaultRepsPerSet.add(new SetReps(1, 8));
-        defaultRepsPerSet.add(new SetReps(2, 8));
-        defaultRepsPerSet.add(new SetReps(3, 8));
-        defaultRepsPerSet.add(new SetReps(4, 8));
+        setReps.add(new SetReps(1, 8));
+        setReps.add(new SetReps(2, 8));
+        setReps.add(new SetReps(3, 8));
+        setReps.add(new SetReps(4, 8));
 
-        testExercise2 = new Exercise("Shoulder Press", 4, defaultRepsPerSet, 8, 50.00, Mode.DUMBBELL);
 
-        Assert.assertTrue(testExercise.equals(testExercise2));
-        Assert.assertEquals(testExercise.hashcode(), testExercise2.hashcode());
+        Exercise e1 = new Exercise("Bench press", 4, setReps, 12, 65.00, Mode.DUMBBELL);
+        Exercise e2 = new Exercise("Bench press", 4, setReps, 12, 65.00, Mode.DUMBBELL);
+
+        Assert.assertTrue(e1.equals(e2));
+        Assert.assertEquals(e1.hashcode(), e2.hashcode());
     }
+
 
     @Test
     public void equalOverrideWorksWithSameObject() {
@@ -131,17 +131,18 @@ public class ExerciseTest {
     }
 
     @Test
-    public void equalOverrideFailsWhenFalse(){
+    public void equalOverrideFailsWhenFalse() {
 
         IExercise testExercise2;
+        List<SetReps> repsPerSet2;
 
-        defaultRepsPerSet = new ArrayList<>();
-        defaultRepsPerSet.add(new SetReps(1, 8));
-        defaultRepsPerSet.add(new SetReps(2, 8));
-        defaultRepsPerSet.add(new SetReps(3, 8));
-        defaultRepsPerSet.add(new SetReps(4, 8));
+        repsPerSet2 = new ArrayList<>();
+        repsPerSet2.add(new SetReps(1, 8));
+        repsPerSet2.add(new SetReps(2, 8));
+        repsPerSet2.add(new SetReps(3, 8));
+        repsPerSet2.add(new SetReps(4, 8));
 
-        testExercise2 = new Exercise("Bench Press", 4, defaultRepsPerSet, 12, 65.00, Mode.DUMBBELL);
+        testExercise2 = new Exercise("Bench Press", 4, repsPerSet2, 12, 65.00, Mode.DUMBBELL);
 
         Assert.assertFalse((testExercise.equals(testExercise2)));
         Assert.assertNotEquals(testExercise.hashcode(), testExercise2.hashcode());
@@ -166,17 +167,19 @@ public class ExerciseTest {
     @Test
     public void consistentHashCodeForEqualObjects() {
 
-        IExercise testExercise2;
+        List<SetReps> setReps = new ArrayList<>();
 
-        defaultRepsPerSet = new ArrayList<>();
-        defaultRepsPerSet.add(new SetReps(1, 8));
-        defaultRepsPerSet.add(new SetReps(2, 8));
-        defaultRepsPerSet.add(new SetReps(3, 8));
-        defaultRepsPerSet.add(new SetReps(4, 8));
+        setReps.add(new SetReps(1, 8));
+        setReps.add(new SetReps(2, 8));
+        setReps.add(new SetReps(3, 8));
+        setReps.add(new SetReps(4, 8));
 
-        testExercise2 = new Exercise("Shoulder Press", 4, defaultRepsPerSet, 8, 50.00, Mode.DUMBBELL);
 
-        Assert.assertEquals(testExercise.hashcode(), testExercise2.hashcode());
+        Exercise e1 = new Exercise("Bench press", 4, setReps, 12, 65.00, Mode.DUMBBELL);
+        Exercise e2 = new Exercise("Bench press", 4, setReps, 12, 65.00, Mode.DUMBBELL);
+
+        Assert.assertTrue(e1.equals(e2));
+        Assert.assertEquals(e1.hashcode(), e2.hashcode());
     }
 
     @Test
@@ -189,7 +192,7 @@ public class ExerciseTest {
         defaultRepsPerSet.add(new SetReps(3, 8));
         defaultRepsPerSet.add(new SetReps(4, 8));
 
-        testExercise2 = new Exercise("Shoulder Press", 4, defaultRepsPerSet, 8, 50.00, Mode.DUMBBELL);
+        testExercise2 = new Exercise("Bench Press", 4, defaultRepsPerSet, 8, 50.00, Mode.DUMBBELL);
 
 
         Assert.assertNotEquals(testExercise, testExercise2);
@@ -203,6 +206,22 @@ public class ExerciseTest {
 
         Assert.assertTrue(map.containsKey(testExercise));
         Assert.assertEquals("Valid Exercise", map.get(testExercise));
+    }
+
+    @Test
+    public void getAllSetRepsReturnsUnmodifiableList() {
+
+        List<SetReps> retrievedSetReps = testExercise.getAllSetReps();
+
+        // Assert: Ensure the list is unmodifiable
+        Assert.assertThrows(UnsupportedOperationException.class, () -> retrievedSetReps.add(new SetReps(5, 10)));
+
+        // Assert: Ensure the returned list matches the original
+        Assert.assertEquals(defaultRepsPerSet, retrievedSetReps);
+
+        // Assert: Ensure modifying the original list doesn't affect the returned list
+        defaultRepsPerSet.add(new SetReps(5, 10)); // This modifies the original test setup
+        Assert.assertNotEquals(defaultRepsPerSet, retrievedSetReps);
     }
 
 }

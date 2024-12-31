@@ -28,8 +28,13 @@ public class SetReps implements ISetReps {
 
     @Override
     public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
         SetReps setReps = (SetReps) object;
         return setNumber == setReps.setNumber && reps == setReps.reps;
     }

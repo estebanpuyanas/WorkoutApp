@@ -57,27 +57,28 @@ public class Exercise implements IExercise {
      * @param mode       the mode of the exercise.
      */
     public Exercise(String name, int sets, List<SetReps> setRepsList, int targetReps, double weight, Mode mode) {
+        checkExerciseNameValid(name);
+        checkExerciseSetsIsValid(sets);
+        checkExerciseWeightValid(weight);
+
         this.name = name;
         this.sets = sets;
-        this.setRepsList = new ArrayList<>(setRepsList);
         this.targetReps = targetReps;
         this.weight = weight;
         this.mode = mode;
 
-        checkExerciseNameValid(name);
-        checkExerciseSetsIsValid(sets);
-        checkExerciseWeightValid(weight);
+        // Generate default SetReps if the list is empty
+        if (setRepsList == null || setRepsList.isEmpty()) {
+            setRepsList = new ArrayList<>();
+            for (int i = 1; i <= sets; i++) {
+                setRepsList.add(new SetReps(i, 0)); // Default reps = 0
+            }
+        }
+
         validateSetRepsList(setRepsList, sets);
+        this.setRepsList = new ArrayList<>(setRepsList); // Ensure immutability
     }
 
-    /**
-     * Validates that the setRepsList matches the number of sets.
-     */
-    private void validateSetRepsList(List<SetReps> setRepsList, int sets) {
-        if (setRepsList.size() != sets) {
-            throw new IllegalArgumentException("Number of SetReps objects must match the number of sets.");
-        }
-    }
 
     /**
      * Allows for the creation of a new exercise.
@@ -146,6 +147,7 @@ public class Exercise implements IExercise {
     @Override
     public void updateReps(int setIndex, int reps) {
         validateSetIndex(setIndex);
+        checkUpdateRepsDifferent(setRepsList.get(setIndex).getReps(), reps);
         setRepsList.set(setIndex, new SetReps(setIndex, reps));
     }
 
@@ -240,14 +242,29 @@ public class Exercise implements IExercise {
      */
     @Override
     public void printExercise() {
-        // Ensure consistent formatting for the weight
         DecimalFormat df = new DecimalFormat("0.00");
         String formattedWeight = df.format(this.getWeight());
+
+        // Format SetReps list
+        StringBuilder repsList = new StringBuilder();
+        boolean allRepsAreZero = true;
+        for (SetReps setReps : setRepsList) {
+            if (setReps.getReps() != 0) {
+                allRepsAreZero = false;
+            }
+            if (repsList.length() > 0) {
+                repsList.append(", ");
+            }
+            repsList.append("Set ").append(setReps.getSetNumber()).append(": ").append(setReps.getReps());
+        }
+
+        // Handle empty or all-zero reps list
+        String repsOutput = allRepsAreZero ? "[]" : "[" + repsList + "]";
 
         System.out.println(
                 this.getName() + " " +
                         this.getSets() + "x" + this.getTargetReps() + "@" + formattedWeight +
-                        " (SetReps: " + this.getAllSetReps() + ")"
+                        " (Reps per set: " + repsOutput + ")"
         );
     }
 
@@ -293,12 +310,23 @@ public class Exercise implements IExercise {
                 this.setRepsList.equals(other.setRepsList); // Compare setRepsList
     }
 
+    //Private helper methods
+
     /**
      * Validates the set index during rep updates.
      */
     private void validateSetIndex(int setIndex) {
         if (setIndex < 0 || setIndex >= sets) {
             throw new IllegalArgumentException("Set index " + setIndex + " is out of bounds for " + sets + " sets.");
+        }
+    }
+
+    /**
+     * Ensures reps are actually different before updating.
+     */
+    private void checkUpdateRepsDifferent(int currentReps, int newReps) {
+        if (currentReps == newReps) {
+            throw new IllegalArgumentException("New reps (" + newReps + ") must be different from current reps (" + currentReps + ").");
         }
     }
 
@@ -337,6 +365,15 @@ public class Exercise implements IExercise {
     private void checkUpdateModeDifferent(Mode currentMode, Mode newMode) {
         if (currentMode == newMode) {
             throw new IllegalArgumentException("Modes must be different for mode updating to work");
+        }
+    }
+
+    /**
+     * Validates that the setRepsList matches the number of sets.
+     */
+    private void validateSetRepsList(List<SetReps> setRepsList, int sets) {
+        if (setRepsList.size() != sets) {
+            throw new IllegalArgumentException("Number of SetReps objects must match the number of sets.");
         }
     }
 }
