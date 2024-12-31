@@ -6,9 +6,8 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class WorkoutTest {
 
@@ -18,27 +17,25 @@ public class WorkoutTest {
     // Create factory setup method to reduce code duplication.
     @Before
     public void setup() {
-
-        // Create a workout
         testWorkout = new Workout("Test Workout");
 
-        // Create and add exercises
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        // Add exercises
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
         testWorkout.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL));
 
-        Map<Integer, Integer> squatReps = new HashMap<>();
-        squatReps.put(0, 12);
-        squatReps.put(1, 10);
-        squatReps.put(2, 10);
+        List<SetReps> squatReps = new ArrayList<>();
+        squatReps.add(new SetReps(1, 12));
+        squatReps.add(new SetReps(2, 10));
+        squatReps.add(new SetReps(3, 10));
         testWorkout.addExercise(new Exercise("Squat", 3, squatReps, 12, 185.00, Mode.BARBELL));
 
-        Map<Integer, Integer> pullupReps = new HashMap<>();
-        pullupReps.put(0, 15);
-        pullupReps.put(1, 12);
-        pullupReps.put(2, 12);
+        List<SetReps> pullupReps = new ArrayList<>();
+        pullupReps.add(new SetReps(1, 15));
+        pullupReps.add(new SetReps(2, 12));
+        pullupReps.add(new SetReps(3, 12));
         testWorkout.addExercise(new Exercise("Pull-ups", 3, pullupReps, 15, 0.00, Mode.BODYWEIGHT));
     }
 
@@ -50,11 +47,10 @@ public class WorkoutTest {
     @Test
     public void workoutThrowsExceptionWhenLessThanOneExercise() {
         Workout emptyWorkout = new Workout("Empty Workout Test");
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
 
-
-        Exercise e1 = new Exercise("Bench press",4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
-        Exercise e2 = new Exercise("Shoulder press",4, repsPerSet, 8, 50.00, Mode.DUMBBELL);
+        List<SetReps> repsPerSet = new ArrayList<>();
+        Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
+        Exercise e2 = new Exercise("Shoulder Press", 4, repsPerSet, 8, 50.00, Mode.DUMBBELL);
 
         emptyWorkout.addExercise(e1);
         emptyWorkout.addExercise(e2);
@@ -65,12 +61,12 @@ public class WorkoutTest {
 
     @Test
     public void addExerciseToWorkoutFunctionsOnValidInput() {
-
-        Map<Integer, Integer> shoulderPressReps = new HashMap<>();
-        shoulderPressReps.put(0, 10);
-        shoulderPressReps.put(1, 10);
-        shoulderPressReps.put(2, 8);
+        List<SetReps> shoulderPressReps = new ArrayList<>();
+        shoulderPressReps.add(new SetReps(1, 10));
+        shoulderPressReps.add(new SetReps(2, 10));
+        shoulderPressReps.add(new SetReps(3, 8));
         IExercise shoulderPress = new Exercise("Shoulder Press", 3, shoulderPressReps, 10, 50.0, Mode.DUMBBELL);
+
         testWorkout.addExercise(shoulderPress);
 
         Assert.assertEquals(4, testWorkout.getExerciseList().size());
@@ -78,28 +74,25 @@ public class WorkoutTest {
 
     @Test
     public void addExerciseToWorkoutRestoresDeletedExercise() {
-
-        // Arrange
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
         IExercise benchPress = new Exercise("Bench Press", 3, benchReps, 10, 200.0, Mode.BARBELL);
 
-        testWorkout.addExercise(benchPress);  // Add to currentExercises
-        testWorkout.removeExercise(benchPress);  // Move to deletedExercises
+        testWorkout.addExercise(benchPress);
+        testWorkout.removeExercise(benchPress);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-
-        testWorkout.addExercise(benchPress);  // Restore to currentExercises
+        testWorkout.addExercise(benchPress);
 
         // Reset System.out
         System.setOut(System.out);
 
-        Assert.assertTrue(testWorkout.getExerciseList().contains(benchPress));  // In currentExercises
-        Assert.assertFalse(testWorkout.getDeletedExercises().contains(benchPress));  // Not in deletedExercises
+        Assert.assertTrue(testWorkout.getExerciseList().contains(benchPress));
+        Assert.assertFalse(testWorkout.getDeletedExercises().contains(benchPress));
 
         String expectedOutput = "Exercise \"Bench Press\" restored to workout \"Test Workout\".\n";
         Assert.assertEquals(expectedOutput, outputStream.toString());
@@ -112,11 +105,10 @@ public class WorkoutTest {
 
     @Test
     public void addExerciseToWorkoutRejectsDuplicates() {
-
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
 
         Assert.assertThrows(IllegalStateException.class,
                 () -> testWorkout.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL)));
@@ -134,37 +126,30 @@ public class WorkoutTest {
 
     @Test
     public void removeExerciseFromWorkoutRejectsInexistentExercise() {
-
-        // Create exercise, but do not add it to the workout.
-        // This will test whether the method detects that it cannot delete exercises that do not exist.
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
         IExercise benchPress = new Exercise("Bench Press", 3, benchReps, 10, 200.0, Mode.BARBELL);
 
-        IllegalArgumentException exception = Assert.assertThrows(
-                IllegalArgumentException.class,
-                () -> testWorkout.removeExercise(benchPress)); // Attempt to remove a non-existent exercise
+        Assert.assertThrows(IllegalArgumentException.class, () -> testWorkout.removeExercise(benchPress));
     }
 
     @Test
     public void editExerciseWorksOnValidInput() {
-
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
         IExercise benchPress = new Exercise("Bench Press", 3, benchReps, 10, 200.0, Mode.BARBELL);
 
-        Map<Integer, Integer> updatedBenchReps = new HashMap<>();
-        updatedBenchReps.put(0, 12);
-        updatedBenchReps.put(1, 12);
-        updatedBenchReps.put(2, 10);
+        List<SetReps> updatedBenchReps = new ArrayList<>();
+        updatedBenchReps.add(new SetReps(1, 12));
+        updatedBenchReps.add(new SetReps(2, 12));
+        updatedBenchReps.add(new SetReps(3, 10));
         IExercise updatedBenchPress = new Exercise("Bench Press", 3, updatedBenchReps, 12, 210.0, Mode.BARBELL);
 
         testWorkout.addExercise(benchPress);
-
         testWorkout.editExercise(benchPress, updatedBenchPress);
 
         Assert.assertTrue(testWorkout.getExerciseList().contains(updatedBenchPress));
@@ -174,23 +159,29 @@ public class WorkoutTest {
     @Test
     public void editExerciseFailsWhenCurrentExerciseIsNull() {
 
-        Map<Integer, Integer> updatedBenchReps = new HashMap<>();
-        updatedBenchReps.put(0, 12);
-        updatedBenchReps.put(1, 12);
-        updatedBenchReps.put(2, 10);
+        // Create updated reps list
+        List<SetReps> updatedBenchReps = new ArrayList<>();
+        updatedBenchReps.add(new SetReps(1, 12));
+        updatedBenchReps.add(new SetReps(2, 12));
+        updatedBenchReps.add(new SetReps(3, 10));
+
+        // Create updated exercise
         IExercise updatedBenchPress = new Exercise("Bench Press", 3, updatedBenchReps, 12, 210.0, Mode.BARBELL);
 
-
+        // Assert that editing with a null current exercise throws an exception
         Assert.assertThrows(IllegalArgumentException.class, () -> testWorkout.editExercise(null, updatedBenchPress));
     }
+
 
     @Test
     public void editExerciseFailsWhenNewExerciseIsNull() {
 
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 12));
+        benchReps.add(new SetReps(2, 12));
+        benchReps.add(new SetReps(3, 10));
+
         IExercise benchPress = new Exercise("Bench Press", 3, benchReps, 10, 200.0, Mode.BARBELL);
 
         testWorkout.addExercise(benchPress);
@@ -201,51 +192,75 @@ public class WorkoutTest {
     @Test
     public void editExerciseFailsWhenExercisesAreIdentical() {
 
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        // Create reps list for the exercise
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
+
+        // Create the exercise
         IExercise benchPress = new Exercise("Bench Press", 3, benchReps, 10, 200.0, Mode.BARBELL);
 
+        // Add the exercise to the workout
         testWorkout.addExercise(benchPress);
 
+        // Assert that editing an exercise with itself throws an exception
         Assert.assertThrows(IllegalStateException.class, () -> testWorkout.editExercise(benchPress, benchPress));
     }
 
     @Test
     public void editExerciseFailsWhenCurrentExerciseNotFound() {
 
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        // Create reps list for the initial exercise
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
         IExercise benchPress = new Exercise("Bench Press", 3, benchReps, 10, 200.0, Mode.BARBELL);
 
-        Map<Integer, Integer> updatedBenchReps = new HashMap<>();
-        updatedBenchReps.put(0, 12);
-        updatedBenchReps.put(1, 12);
-        updatedBenchReps.put(2, 10);
+        // Create reps list for the updated exercise
+        List<SetReps> updatedBenchReps = new ArrayList<>();
+        updatedBenchReps.add(new SetReps(1, 12));
+        updatedBenchReps.add(new SetReps(2, 12));
+        updatedBenchReps.add(new SetReps(3, 10));
         IExercise updatedBenchPress = new Exercise("Bench Press", 3, updatedBenchReps, 12, 210.0, Mode.BARBELL);
 
+        // Assert that editing an exercise not found in the workout throws an exception
         Assert.assertThrows(IllegalArgumentException.class, () -> testWorkout.editExercise(benchPress, updatedBenchPress));
     }
+
 
     @Test
     public void restoreExerciseWorksOnValidInput() {
         // Setup
         Workout workout = new Workout("Test Workout");
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        IExercise exercise1 = new Exercise("Bench Press", 4, repsPerSet, 12, 65.00, Mode.DUMBBELL);
-        IExercise exercise2 = new Exercise("Shoulder Press", 4, repsPerSet, 12, 50.00, Mode.DUMBBELL);
+
+        // Create reps list for the exercises
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 12));
+        benchReps.add(new SetReps(2, 12));
+        benchReps.add(new SetReps(3, 12));
+        benchReps.add(new SetReps(4, 12));
+
+        List<SetReps> shoulderReps = new ArrayList<>();
+        shoulderReps.add(new SetReps(1, 12));
+        shoulderReps.add(new SetReps(2, 12));
+        shoulderReps.add(new SetReps(3, 12));
+        shoulderReps.add(new SetReps(4, 12));
+
+        IExercise exercise1 = new Exercise("Bench Press", 4, benchReps, 12, 65.00, Mode.DUMBBELL);
+        IExercise exercise2 = new Exercise("Shoulder Press", 4, shoulderReps, 12, 50.00, Mode.DUMBBELL);
+
+        // Add exercise2 to workout
         workout.addExercise(exercise2);
 
-        // Add exercise to currentExercises list
+        // Add exercise1 to currentExercises list
         workout.addExercise(exercise1);
 
-        // Remove exercise (moves it to deletedExercises list)
+        // Remove exercise1 (moves it to deletedExercises list)
         workout.removeExercise(exercise1);
 
-        // Call restoreExercise (moves it back to currentExercises list)
+        // Call restoreExercise (moves exercise1 back to currentExercises list)
         workout.restoreExercise(exercise1);
 
         // Assertions
@@ -254,6 +269,7 @@ public class WorkoutTest {
         Assert.assertFalse("Exercise should be removed from deletedExercises after restoration.",
                 workout.getDeletedExercises().contains(exercise1));
     }
+
 
     @Test
     public void getNameWorks() {
@@ -336,50 +352,30 @@ public class WorkoutTest {
         // Create same workout as in @before setup method.
         Workout identicalWorkout = new Workout("Test Workout");
 
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        // Create reps list for exercises
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
+
+        List<SetReps> squatReps = new ArrayList<>();
+        squatReps.add(new SetReps(1, 12));
+        squatReps.add(new SetReps(2, 10));
+        squatReps.add(new SetReps(3, 10));
+
+        List<SetReps> pullupReps = new ArrayList<>();
+        pullupReps.add(new SetReps(1, 15));
+        pullupReps.add(new SetReps(2, 12));
+        pullupReps.add(new SetReps(3, 12));
+
+        // Add exercises to identicalWorkout
         identicalWorkout.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL));
-
-        Map<Integer, Integer> squatReps = new HashMap<>();
-        squatReps.put(0, 12);
-        squatReps.put(1, 10);
-        squatReps.put(2, 10);
         identicalWorkout.addExercise(new Exercise("Squat", 3, squatReps, 12, 185.00, Mode.BARBELL));
-
-        Map<Integer, Integer> pullupReps = new HashMap<>();
-        pullupReps.put(0, 15);
-        pullupReps.put(1, 12);
-        pullupReps.put(2, 12);
         identicalWorkout.addExercise(new Exercise("Pull-ups", 3, pullupReps, 15, 0.00, Mode.BODYWEIGHT));
 
-        debugWorkoutEquality(testWorkout, identicalWorkout);
-
+        // Assertions
         Assert.assertEquals(testWorkout, identicalWorkout);
         Assert.assertEquals(testWorkout.hashcode(), identicalWorkout.hashcode());
-    }
-
-    private void debugWorkoutEquality(Workout w1, Workout w2) {
-        System.out.println("Comparing workouts...");
-        System.out.println("Workout Names: " + w1.getWorkoutName() + " vs. " + w2.getWorkoutName());
-
-        System.out.println("Workout Exercises:");
-        List<IExercise> w1Exercises = w1.getExerciseList();
-        List<IExercise> w2Exercises = w2.getExerciseList();
-
-        System.out.println("Test Workout Exercises:");
-        for (IExercise ex : w1Exercises) {
-            System.out.println("  " + ex.getName() + ", hashCode: " + ex.hashCode() + ", repsPerSet: " + ex.getRepsForAllSets().hashCode());
-        }
-
-        System.out.println("Identical Workout Exercises:");
-        for (IExercise ex : w2Exercises) {
-            System.out.println("  " + ex.getName() + ", hashCode: " + ex.hashCode() + ", repsPerSet: " + ex.getRepsForAllSets().hashCode());
-        }
-
-        System.out.println("Exercise List Equality: " + w1Exercises.equals(w2Exercises));
-        System.out.println("Workout hashCodes: " + w1.hashCode() + " vs. " + w2.hashCode());
     }
 
     @Test
@@ -387,22 +383,23 @@ public class WorkoutTest {
 
         Workout differentWorkout = new Workout("Different Workout");
 
-        Map<Integer, Integer> benchReps = new HashMap<>();
-        benchReps.put(0, 10);
-        benchReps.put(1, 10);
-        benchReps.put(2, 8);
+        // Add exercises
+        List<SetReps> benchReps = new ArrayList<>();
+        benchReps.add(new SetReps(1, 10));
+        benchReps.add(new SetReps(2, 10));
+        benchReps.add(new SetReps(3, 8));
         differentWorkout.addExercise(new Exercise("Bench Press", 3, benchReps, 10, 65.00, Mode.DUMBBELL));
 
-        Map<Integer, Integer> squatReps = new HashMap<>();
-        squatReps.put(0, 12);
-        squatReps.put(1, 10);
-        squatReps.put(2, 10);
+        List<SetReps> squatReps = new ArrayList<>();
+        squatReps.add(new SetReps(1, 12));
+        squatReps.add(new SetReps(2, 10));
+        squatReps.add(new SetReps(3, 10));
         differentWorkout.addExercise(new Exercise("Squat", 3, squatReps, 12, 185.00, Mode.BARBELL));
 
-        Map<Integer, Integer> pullupReps = new HashMap<>();
-        pullupReps.put(0, 15);
-        pullupReps.put(1, 12);
-        pullupReps.put(2, 12);
+        List<SetReps> pullupReps = new ArrayList<>();
+        pullupReps.add(new SetReps(1, 15));
+        pullupReps.add(new SetReps(2, 12));
+        pullupReps.add(new SetReps(3, 12));
         differentWorkout.addExercise(new Exercise("Pull-ups", 3, pullupReps, 15, 0.00, Mode.BODYWEIGHT));
 
         Assert.assertNotEquals(testWorkout, differentWorkout);
@@ -413,10 +410,10 @@ public class WorkoutTest {
 
         Workout differentExercisesWorkout = new Workout("Test Workout");
 
-        Map<Integer, Integer> deadliftReps = new HashMap<>();
-        deadliftReps.put(0, 10);
-        deadliftReps.put(1, 10);
-        deadliftReps.put(2, 10);
+        List<SetReps> deadliftReps = new ArrayList<>();
+        deadliftReps.add(new SetReps(1, 10));
+        deadliftReps.add(new SetReps(2, 10));
+        deadliftReps.add(new SetReps(3, 10));
         differentExercisesWorkout.addExercise(new Exercise("Deadlift", 3, deadliftReps, 10, 225.00, Mode.BARBELL));
 
         Assert.assertNotEquals(testWorkout, differentExercisesWorkout);
@@ -429,11 +426,10 @@ public class WorkoutTest {
         // Same name as @before seup method workout
         Workout differentWorkout = new Workout("Test Workout");
 
-        // Add different exercises
-        Map<Integer, Integer> deadliftReps = new HashMap<>();
-        deadliftReps.put(0, 10);
-        deadliftReps.put(1, 10);
-        deadliftReps.put(2, 10);
+        List<SetReps> deadliftReps = new ArrayList<>();
+        deadliftReps.add(new SetReps(1, 10));
+        deadliftReps.add(new SetReps(2, 10));
+        deadliftReps.add(new SetReps(3, 10));
         differentWorkout.addExercise(new Exercise("Deadlift", 3, deadliftReps, 10, 225.00, Mode.BARBELL));
 
         Assert.assertNotEquals(testWorkout.hashCode(), differentWorkout.hashCode());

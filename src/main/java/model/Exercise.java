@@ -1,9 +1,9 @@
 package model;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Implementation of IExercise interface that represents an exercise.
@@ -27,10 +27,9 @@ public class Exercise implements IExercise {
     private int sets;
 
     /**
-     * Data structure that stores the sets:reps as KV pair in a LinkedHashMap.
-     * The LinkedHashMap preserves the order of insertion, ensuring consistent hashCode.
+     * List to store SetReps objects representing reps for each set.
      */
-    private final Map<Integer, Integer> repsPerSet;
+    private final List<SetReps> setRepsList;
 
     /**
      * The target amount of repetitions desired to be achieved in a set.
@@ -52,15 +51,15 @@ public class Exercise implements IExercise {
      *
      * @param name       the name of the exercise.
      * @param sets       the sets of the exercise.
-     * @param repsPerSet the reps done per each set of the exercise.
+     * @param setRepsList the reps done per each set of the exercise.
      * @param targetReps the target amount of repetitions desired to be achieved in a set.
      * @param weight     the weight of the exercise.
      * @param mode       the mode of the exercise.
      */
-    public Exercise(String name, int sets, Map<Integer, Integer> repsPerSet, int targetReps, double weight, Mode mode) {
+    public Exercise(String name, int sets, List<SetReps> setRepsList, int targetReps, double weight, Mode mode) {
         this.name = name;
         this.sets = sets;
-        this.repsPerSet = new LinkedHashMap<>(repsPerSet); // Use LinkedHashMap for consistent ordering
+        this.setRepsList = new ArrayList<>(setRepsList);
         this.targetReps = targetReps;
         this.weight = weight;
         this.mode = mode;
@@ -68,6 +67,16 @@ public class Exercise implements IExercise {
         checkExerciseNameValid(name);
         checkExerciseSetsIsValid(sets);
         checkExerciseWeightValid(weight);
+        validateSetRepsList(setRepsList, sets);
+    }
+
+    /**
+     * Validates that the setRepsList matches the number of sets.
+     */
+    private void validateSetRepsList(List<SetReps> setRepsList, int sets) {
+        if (setRepsList.size() != sets) {
+            throw new IllegalArgumentException("Number of SetReps objects must match the number of sets.");
+        }
     }
 
     /**
@@ -75,15 +84,15 @@ public class Exercise implements IExercise {
      *
      * @param name       the given name.
      * @param sets       the number of sets the exercise will be done for.
-     * @param repsPerSet the repetitions of the exercise per set. Set number is the Key, repetitions is Value.
+     * @param setRepsList the repetitions of the exercise per set.
      * @param targetReps the target amount of repetitions desired to be achieved in a set.
      * @param weight     the weight being used for the exercise.
      * @param mode       the mode of the exercise.
      * @return a new exercise, with the specified parameters.
      */
     @Override
-    public Exercise createExercise(String name, int sets, Map<Integer, Integer> repsPerSet, int targetReps, double weight, Mode mode) {
-        return new Exercise(name, sets, repsPerSet, targetReps, weight, mode);
+    public Exercise createExercise(String name, int sets, List<SetReps> setRepsList, int targetReps, double weight, Mode mode) {
+        return new Exercise(name, sets, setRepsList, targetReps, weight, mode);
     }
 
     /**
@@ -129,26 +138,24 @@ public class Exercise implements IExercise {
     }
 
     /**
-     * Updates the reps at a specified set dynamically.
+     * Updates the reps for a specific set.
      *
-     * @param setIndex the set that will be updated.
+     * @param setIndex the index of the set to update.
      * @param reps     the number of reps to assign to the set.
      */
     @Override
     public void updateReps(int setIndex, int reps) {
         validateSetIndex(setIndex);
-        checkUpdateRepsDifferent(repsPerSet.getOrDefault(setIndex, -1), reps);
-        repsPerSet.put(setIndex, reps);
+        setRepsList.set(setIndex, new SetReps(setIndex, reps));
     }
 
     /**
-     * Obtains all the reps of every set.
+     * Obtains all the SetReps for every set.
      *
-     * @return the reps of every set.
+     * @return the SetReps list for every set.
      */
-    @Override
-    public Map<Integer, Integer> getRepsForAllSets() {
-        return Collections.unmodifiableMap(repsPerSet);
+    public List<SetReps> getAllSetReps() {
+        return Collections.unmodifiableList(setRepsList);
     }
 
     /**
@@ -158,9 +165,9 @@ public class Exercise implements IExercise {
      * @return the number of reps.
      */
     @Override
-    public Integer getRepsForSpecificSet(int setIndex) {
+    public int getRepsForSpecificSet(int setIndex) {
         validateSetIndex(setIndex);
-        return repsPerSet.getOrDefault(setIndex, 0);
+        return setRepsList.get(setIndex).getReps();
     }
 
     /**
@@ -220,7 +227,7 @@ public class Exercise implements IExercise {
      */
     @Override
     public void updateTargetReps(int newTargetReps) {
-        if(newTargetReps == this.targetReps){
+        if (newTargetReps == this.targetReps) {
             throw new IllegalArgumentException("New target reps must be different from current target reps");
         } else {
             this.targetReps = newTargetReps;
@@ -240,7 +247,7 @@ public class Exercise implements IExercise {
         System.out.println(
                 this.getName() + " " +
                         this.getSets() + "x" + this.getTargetReps() + "@" + formattedWeight +
-                        " (Reps per set: " + this.getRepsForAllSets() + ")"
+                        " (SetReps: " + this.getAllSetReps() + ")"
         );
     }
 
@@ -256,9 +263,10 @@ public class Exercise implements IExercise {
         result = 31 * result + Integer.hashCode(targetReps);
         result = 31 * result + Double.hashCode(weight);
         result = 31 * result + (mode != null ? mode.hashCode() : 0);
-        result = 31 * result + repsPerSet.hashCode(); // Include repsPerSet in hashCode
+        result = 31 * result + setRepsList.hashCode(); // Include setRepsList in hashCode
         return result;
     }
+
 
     /**
      * Overridden equals method to ensure object equality for Exercise objects.
@@ -282,7 +290,7 @@ public class Exercise implements IExercise {
                 Double.compare(this.weight, other.weight) == 0 &&
                 this.sets == other.sets &&
                 this.targetReps == other.targetReps &&
-                this.repsPerSet.equals(other.repsPerSet); // Compare repsPerSet
+                this.setRepsList.equals(other.setRepsList); // Compare setRepsList
     }
 
     /**
@@ -322,17 +330,8 @@ public class Exercise implements IExercise {
     }
 
     /**
-     * Ensures reps are actually different before updating.
-     */
-    private void checkUpdateRepsDifferent(int currentReps, int newReps) {
-        if (currentReps == newReps) {
-            throw new IllegalArgumentException("New reps (" + newReps + ") must be different from current reps (" + currentReps + ").");
-        }
-    }
-
-    /**
      * Ensures that when updating mode, the current mode and new mode are different.
-     * @param currentMode the currnet mode of the exercise.
+     * @param currentMode the current mode of the exercise.
      * @param newMode the new mode of the exercise.
      */
     private void checkUpdateModeDifferent(Mode currentMode, Mode newMode) {

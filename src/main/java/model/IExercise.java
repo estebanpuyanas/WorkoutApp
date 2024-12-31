@@ -1,5 +1,6 @@
 package model;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,13 +18,13 @@ public interface IExercise {
      *
      * @param name       the given name.
      * @param sets       the number of sets the exercise will be done for.
-     * @param repsPerSet the repetitions of the exercise per set. Set number is the Key, repetitions is Value.
+     * @param setRepsList the repetitions of the exercise per set. Set number is the Key, repetitions is Value.
      * @param targetReps the target amount of repetitions desired to be achived in a set.
      * @param weight     the  weight being used for the exercise.
      * @param mode       the mode of the exercise.
      * @return a new exercise, with the specified parameters.
      */
-    Exercise createExercise(String name, int sets, Map<Integer, Integer> repsPerSet, int targetReps, double weight, Mode mode);
+    Exercise createExercise(String name, int sets, List<SetReps> setRepsList, int targetReps, double weight, Mode mode);
 
     /**
      * Updates the weight being used on this exercise.
@@ -66,7 +67,7 @@ public interface IExercise {
      *
      * @return the reps of every set.
      */
-    Map<Integer, Integer> getRepsForAllSets();
+    List<SetReps> getAllSetReps();
 
     /**
      * Obtains the reps for the specified set.
@@ -74,7 +75,7 @@ public interface IExercise {
      * @param setIndex the specified set.
      * @return the nuumber of reps.
      */
-    Integer getRepsForSpecificSet(int setIndex);
+    int getRepsForSpecificSet(int setIndex);
 
     /**
      * Sets the mode of this exercise.

@@ -1,68 +1,72 @@
 package model;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ExerciseTest {
 
+    private Exercise testExercise;
+    private List<SetReps> defaultRepsPerSet;
+
+    @Before
+    public void setup() {
+        defaultRepsPerSet = new ArrayList<>();
+        defaultRepsPerSet.add(new SetReps(1, 8));
+        defaultRepsPerSet.add(new SetReps(2, 8));
+        defaultRepsPerSet.add(new SetReps(3, 8));
+        defaultRepsPerSet.add(new SetReps(4, 8));
+
+        testExercise = new Exercise("Shoulder Press", 4, defaultRepsPerSet, 8, 50.00, Mode.DUMBBELL);
+    }
+
     @Test
     public void ExerciseGettersWorksOnValidInput() {
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        Exercise newExercise = new Exercise("Shoulder Press", 4, repsPerSet,8,50.00, Mode.DUMBBELL);
 
-        Assert.assertEquals(newExercise.getName(), "Shoulder Press");
-        Assert.assertEquals(newExercise.getSets(), 4);
-        Assert.assertEquals(newExercise.getMode(), Mode.DUMBBELL);
-        Assert.assertEquals(newExercise.getWeight(), 50.00, 0.00);
-        Assert.assertEquals(8, newExercise.getTargetReps());
+        Assert.assertEquals(testExercise.getName(), "Shoulder Press");
+        Assert.assertEquals(testExercise.getSets(), 4);
+        Assert.assertEquals(testExercise.getMode(), Mode.DUMBBELL);
+        Assert.assertEquals(testExercise.getWeight(), 50.00, 0.00);
+        Assert.assertEquals(8, testExercise.getTargetReps());
     }
 
     @Test
     public void updateFunctionsOnExerciseWorkOnValidInput() {
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        repsPerSet.put(0, 5);
-        Exercise newExercise = new Exercise("Shoulder Press", 4, repsPerSet,8,50.00, Mode.DUMBBELL);
 
-        newExercise.updateName("Seated shoulder press");
-        Assert.assertEquals("Seated shoulder press", newExercise.getName());
+        testExercise.updateName("Seated shoulder press");
+        Assert.assertEquals("Seated shoulder press", testExercise.getName());
 
-        newExercise.updateSets(1);
-        Assert.assertEquals(1, newExercise.getSets());
+        testExercise.updateSets(1);
+        Assert.assertEquals(1, testExercise.getSets());
 
-        newExercise.updateMode(Mode.BARBELL);
-        Assert.assertEquals(Mode.BARBELL, newExercise.getMode());
+        testExercise.updateMode(Mode.BARBELL);
+        Assert.assertEquals(Mode.BARBELL, testExercise.getMode());
 
-        newExercise.updateReps(0, 12);
-        Assert.assertEquals(Integer.valueOf(12), newExercise.getRepsForSpecificSet(0));
+        testExercise.updateReps(0, 12);
+        Assert.assertEquals(12, testExercise.getRepsForSpecificSet(0));
 
-        newExercise.updateTargetReps(12);
-        Assert.assertEquals(12, newExercise.getTargetReps());
+        testExercise.updateTargetReps(12);
+        Assert.assertEquals(12, testExercise.getTargetReps());
 
-        newExercise.updateWeight(45.00);
-        Assert.assertEquals(45.00, newExercise.getWeight(),0.00);
+        testExercise.updateWeight(45.00);
+        Assert.assertEquals(45.00, testExercise.getWeight(),0.00);
     }
 
     @Test
     public void printExerciseOutputsCorrectFormat() {
 
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        repsPerSet.put(0, 8);
-        repsPerSet.put(1, 8);
-        repsPerSet.put(2, 8);
-        repsPerSet.put(3, 8);
-
-        Exercise exercise = new Exercise("Shoulder Press", 4, repsPerSet, 8, 50.00, Mode.DUMBBELL);
-
         // Redirect System.out to a ByteArrayOutputStream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        exercise.printExercise();
+        testExercise.printExercise();
 
         // Reset System.out
         System.setOut(System.out);
@@ -74,84 +78,87 @@ public class ExerciseTest {
     @Test
     public void printExerciseHandlesEmptyRepsPerSet() {
 
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        Exercise exercise = new Exercise("Bicep Curl", 4, repsPerSet, 12, 25.00, Mode.BARBELL);
+        List<SetReps> emptyRepsPerSet = new ArrayList<>();
+        Exercise exerciseWithEmptyReps = new Exercise("Bicep Curl", 4, emptyRepsPerSet, 12, 25.00, Mode.BARBELL);
 
         // Redirect System.out to a ByteArrayOutputStream
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        exercise.printExercise();
+        exerciseWithEmptyReps.printExercise();
 
-        // Reset System.out
+
         System.setOut(System.out);
 
-        String expectedOutput = "Bicep Curl 4x12@25.00 (Reps per set: {})\n";
+        String expectedOutput = "Bicep Curl 4x12@25.00 (Reps per set: [])\n";
         Assert.assertEquals(expectedOutput, outputStream.toString());
     }
 
     @Test
     public void updateFunctionsOnExerciseFailOnInvalidInput() {
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        repsPerSet.put(0, 5);
-        Exercise newExercise = new Exercise("Shoulder Press", 4, repsPerSet,8,50.00, Mode.DUMBBELL);
 
-        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateName(""));
-        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateSets(-1));
-        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(0, 5));
-        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(-5, 5)); //negative index fails
-        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateReps(5, 5)); //index > sets fails
-        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateTargetReps(8));
-        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateMode(Mode.DUMBBELL));
-        Assert.assertThrows(IllegalArgumentException.class, () -> newExercise.updateWeight(-65.00));
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateName(""));
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateSets(-1));
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateReps(0, 5));
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateReps(-5, 5)); //negative index fails
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateReps(5, 5)); //index > sets fails
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateTargetReps(8));
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateMode(Mode.DUMBBELL));
+        Assert.assertThrows(IllegalArgumentException.class, () -> testExercise.updateWeight(-65.00));
     }
 
     @Test
-    public void equalOverrideWorksWhenTrue(){
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
-        Exercise e2 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
+    public void equalOverrideWorksWhenTrue() {
 
-        Assert.assertTrue(e1.equals(e2));
-        Assert.assertEquals(e1.hashcode(), e2.hashcode());
+        // Create a new exercise that is the same as in @before setup method.
+        IExercise testExercise2;
+
+        defaultRepsPerSet = new ArrayList<>();
+        defaultRepsPerSet.add(new SetReps(1, 8));
+        defaultRepsPerSet.add(new SetReps(2, 8));
+        defaultRepsPerSet.add(new SetReps(3, 8));
+        defaultRepsPerSet.add(new SetReps(4, 8));
+
+        testExercise2 = new Exercise("Shoulder Press", 4, defaultRepsPerSet, 8, 50.00, Mode.DUMBBELL);
+
+        Assert.assertTrue(testExercise.equals(testExercise2));
+        Assert.assertEquals(testExercise.hashcode(), testExercise2.hashcode());
     }
 
     @Test
     public void equalOverrideWorksWithSameObject() {
-
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
-        Assert.assertTrue(e1.equals(e1));
+        Assert.assertTrue(testExercise.equals(testExercise));
     }
 
     @Test
     public void equalOverrideFailsWhenFalse(){
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
-        Exercise e2 = new Exercise("Incline Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
 
-        Assert.assertFalse((e1.equals(e2)));
-        Assert.assertNotEquals(e1.hashcode(), e2.hashcode());
+        IExercise testExercise2;
+
+        defaultRepsPerSet = new ArrayList<>();
+        defaultRepsPerSet.add(new SetReps(1, 8));
+        defaultRepsPerSet.add(new SetReps(2, 8));
+        defaultRepsPerSet.add(new SetReps(3, 8));
+        defaultRepsPerSet.add(new SetReps(4, 8));
+
+        testExercise2 = new Exercise("Bench Press", 4, defaultRepsPerSet, 12, 65.00, Mode.DUMBBELL);
+
+        Assert.assertFalse((testExercise.equals(testExercise2)));
+        Assert.assertNotEquals(testExercise.hashcode(), testExercise2.hashcode());
     }
 
     @Test
     public void equalOverrideReturnsFalseWhenNull(){
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        Exercise e1 = new Exercise("Bench Press", 4, repsPerSet, 8, 65.00, Mode.DUMBBELL);
         Exercise e2 = null;
 
-        Assert.assertFalse((e1.equals(e2)));
+        Assert.assertFalse((testExercise.equals(e2)));
     }
 
     @Test
     public void sameHashCodeForSameObject() {
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        repsPerSet.put(0, 8);
-        repsPerSet.put(1, 8);
-        Exercise exercise = new Exercise("Shoulder Press", 4, repsPerSet, 8, 50.0, Mode.DUMBBELL);
 
-        int hashcode1 = exercise.hashcode();
-        int hashcode2 = exercise.hashcode();
+        int hashcode1 = testExercise.hashcode();
+        int hashcode2 = testExercise.hashcode();
 
         Assert.assertEquals(hashcode1, hashcode2);
     }
@@ -159,48 +166,43 @@ public class ExerciseTest {
     @Test
     public void consistentHashCodeForEqualObjects() {
 
-        Map<Integer, Integer> repsPerSet1 = new HashMap<>();
-        repsPerSet1.put(0, 8);
-        repsPerSet1.put(1, 8);
-        Exercise exercise1 = new Exercise("Shoulder Press", 4, repsPerSet1, 8, 50.0, Mode.DUMBBELL);
+        IExercise testExercise2;
 
-        Map<Integer, Integer> repsPerSet2 = new HashMap<>();
-        repsPerSet2.put(0, 8);
-        repsPerSet2.put(1, 8);
-        Exercise exercise2 = new Exercise("Shoulder Press", 4, repsPerSet2, 8, 50.0, Mode.DUMBBELL);
+        defaultRepsPerSet = new ArrayList<>();
+        defaultRepsPerSet.add(new SetReps(1, 8));
+        defaultRepsPerSet.add(new SetReps(2, 8));
+        defaultRepsPerSet.add(new SetReps(3, 8));
+        defaultRepsPerSet.add(new SetReps(4, 8));
 
-        Assert.assertEquals(exercise1.hashcode(), exercise2.hashcode());
+        testExercise2 = new Exercise("Shoulder Press", 4, defaultRepsPerSet, 8, 50.00, Mode.DUMBBELL);
+
+        Assert.assertEquals(testExercise.hashcode(), testExercise2.hashcode());
     }
 
     @Test
     public void differentHashCodeForUnequalObjects() {
+        IExercise testExercise2;
 
-        Map<Integer, Integer> repsPerSet1 = new HashMap<>();
-        repsPerSet1.put(0, 8);
-        repsPerSet1.put(1, 8);
-        Exercise exercise1 = new Exercise("Bench Press", 4, repsPerSet1, 8, 65.00, Mode.BARBELL);
+        defaultRepsPerSet = new ArrayList<>();
+        defaultRepsPerSet.add(new SetReps(1, 8));
+        defaultRepsPerSet.add(new SetReps(2, 8));
+        defaultRepsPerSet.add(new SetReps(3, 8));
+        defaultRepsPerSet.add(new SetReps(4, 8));
 
-        Map<Integer, Integer> repsPerSet2 = new HashMap<>();
-        repsPerSet2.put(0, 8);
-        repsPerSet2.put(1, 8);
-        Exercise exercise2 = new Exercise("Shoulder Press", 4, repsPerSet2, 8, 50.0, Mode.DUMBBELL);
+        testExercise2 = new Exercise("Shoulder Press", 4, defaultRepsPerSet, 8, 50.00, Mode.DUMBBELL);
 
-        Assert.assertNotEquals(exercise1, exercise2);
+
+        Assert.assertNotEquals(testExercise, testExercise2);
     }
 
     // Checks whether hashcode implementation allows for object to work as key of hashmap.
     @Test
     public void hashCodeWorksInHashMap() {
-
-        Map<Integer, Integer> repsPerSet = new HashMap<>();
-        repsPerSet.put(0, 8);
-        repsPerSet.put(1, 8);
-        Exercise exercise = new Exercise("Shoulder Press", 4, repsPerSet, 8, 50.0, Mode.DUMBBELL);
-
         HashMap<Exercise, String> map = new HashMap<>();
-        map.put(exercise, "Valid Exercise");
+        map.put(testExercise, "Valid Exercise");
 
-        Assert.assertTrue(map.containsKey(exercise));
-        Assert.assertEquals("Valid Exercise", map.get(exercise));
+        Assert.assertTrue(map.containsKey(testExercise));
+        Assert.assertEquals("Valid Exercise", map.get(testExercise));
     }
+
 }
