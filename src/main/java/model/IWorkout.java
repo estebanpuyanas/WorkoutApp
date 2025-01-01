@@ -57,7 +57,17 @@ public interface IWorkout {
      */
     List<IExercise> getExerciseList();
 
+    /**
+     * Overriden hashcode method which generates and returns a unique hashcode to each object.
+     * @return the hashcode of the object.
+     */
     int hashcode();
 
+
+    /**
+     * Overriden equals method which check if this object is equal to @param object.
+     * @param object the other object to compare with.
+     * @return tru if this and other object are equal, false otherwise.
+     */
     boolean equals(Object object);
 }

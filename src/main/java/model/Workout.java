@@ -1,7 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Collections;
 
@@ -26,6 +25,8 @@ public class Workout implements IWorkout {
         this.name = name;
         this.currentExercises = new ArrayList<>();
         this.deletedExercises = new ArrayList<>();
+
+        checkWorkoutNameIsValid();
     }
 
     /**
@@ -38,8 +39,7 @@ public class Workout implements IWorkout {
         checkAddExerciseRejectsDuplicates(exercise);
 
         if (deletedExercises.contains(exercise)) {
-            this.deletedExercises.remove(exercise);
-            this.currentExercises.add(exercise);
+            restoreExercise(exercise); //TODO WRITE TEST FOR THIS PART OF LOGIC.
             System.out.println("Exercise \"" + exercise.getName() + "\" restored to workout \"" + name + "\".");
         } else {
             this.currentExercises.add(exercise);
@@ -177,6 +177,10 @@ public class Workout implements IWorkout {
         return Collections.unmodifiableList(currentExercises);
     }
 
+    /**
+     * Generates and returns a unique hashcode to each object.
+     * @return the hashcode of the object.
+     */
     @Override
     public int hashcode() {
         int result = name.hashCode();
@@ -186,6 +190,11 @@ public class Workout implements IWorkout {
         return result;
     }
 
+    /**
+     * Overriden equals method which check if this object is equal to @param object.
+     * @param object the other object to compare with.
+     * @return tru if this and other object are equal, false otherwise.
+     */
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
@@ -226,7 +235,7 @@ public class Workout implements IWorkout {
      */
     private void checkExerciseIsNotNull(IExercise exercise) {
         if (exercise == null) {
-            throw new IllegalArgumentException("Cannot add or modify a null exercise in workout \"" + name + "\".");
+            throw new IllegalArgumentException("Cannot add, modify, or delete a null exercise in workout \"" + name + "\".");
         }
     }
 
@@ -236,6 +245,12 @@ public class Workout implements IWorkout {
     private void validateWorkoutHasAtLeastOneExercise() {
         if (currentExercises.isEmpty()) {
             throw new IllegalStateException("A workout must contain at least one exercise.");
+        }
+    }
+
+    private void checkWorkoutNameIsValid() {
+        if(this.name == null || this.name.isEmpty()) {
+            throw new IllegalArgumentException("Workout name cannot be valid or null");
         }
     }
 }

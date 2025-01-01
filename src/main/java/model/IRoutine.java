@@ -13,6 +13,8 @@ public interface IRoutine {
 
     void editRoutine(int oldIndex, int newIndex);
 
+    void restoreWorkoutToRoutine(IWorkout workout);
+
     String getRoutineName();
 
     void setRoutineName(String newName);
@@ -20,4 +22,8 @@ public interface IRoutine {
     List<IWorkout> getWorkouts();
 
     void printRoutine();
+
+    int hashcode();
+
+    boolean equals(Object object);
 }

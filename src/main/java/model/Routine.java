@@ -3,7 +3,6 @@ package model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Represents a routine, which is a collection of workouts.
@@ -11,12 +10,14 @@ import java.util.Objects;
 public class Routine implements IRoutine {
 
     private String name;
-    private final List<IWorkout> routine;
+    private final List<IWorkout> currentWorkoutsInRoutine;
+    private final List<IWorkout> deleletedWorkoutsInRoutine;
 
     public Routine(String name) {
         checkRoutineNameValid(name);
         this.name = name;
-        this.routine = new ArrayList<>();
+        this.currentWorkoutsInRoutine = new ArrayList<>();
+        this.deleletedWorkoutsInRoutine = new ArrayList<>();
     }
 
     @Override
@@ -25,28 +26,41 @@ public class Routine implements IRoutine {
         return new Routine(name);
     }
 
+    //TODO ADD PRINTING LOG MESSAGES
     @Override
     public void addWorkoutToRoutine(IWorkout workout) {
+
         checkWorkoutAddedToRoutineIsValid(workout);
-        routine.add(workout);
+        checkWorkoutIsNotNull(workout);
+
+        if(deleletedWorkoutsInRoutine.contains(workout)) {
+            this.deleletedWorkoutsInRoutine.remove(workout);
+            this.currentWorkoutsInRoutine.add(workout);
+        } else {
+            currentWorkoutsInRoutine.add(workout);
+        }
     }
 
     @Override
     public void removeWorkoutFromRoutine(IWorkout workout) {
-        if (!routine.contains(workout)) {
+        checkRoutineSizeValidForDeleteWorkout();
+        if (!currentWorkoutsInRoutine.contains(workout)) {
             throw new IllegalArgumentException("The workout \"" + workout.getWorkoutName() + "\" is not in the routine.");
         }
-        routine.remove(workout);
+        currentWorkoutsInRoutine.remove(workout);
+        deleletedWorkoutsInRoutine.add(workout);
     }
 
+    //TODO CONSIDER WHETHER THIS METHOD SHOULD BE KEPT. (PROBABLY YES).
     @Override
     public void deleteRoutine() {
-        if (routine.isEmpty()) {
+        if (currentWorkoutsInRoutine.isEmpty()) {
             throw new IllegalStateException("Cannot delete an already empty routine.");
         }
-        routine.clear();
+        currentWorkoutsInRoutine.clear();
     }
 
+    //TODO CHECK IF METHOD LOGIC CAN BE IMPROVED.
     @Override
     public void editRoutine(int oldIndex, int newIndex) {
         checkRoutineSizeValidForEdit();
@@ -54,11 +68,22 @@ public class Routine implements IRoutine {
         if (oldIndex == newIndex) {
             throw new IllegalArgumentException("Old index and new index cannot be the same.");
         }
-        if (oldIndex >= 0 && oldIndex < routine.size() && newIndex >= 0 && newIndex < routine.size()) {
-            IWorkout workout = routine.remove(oldIndex);
-            routine.add(newIndex, workout);
+        if (oldIndex >= 0 && oldIndex < currentWorkoutsInRoutine.size() && newIndex >= 0 && newIndex < currentWorkoutsInRoutine.size()) {
+            IWorkout workout = currentWorkoutsInRoutine.remove(oldIndex);
+            currentWorkoutsInRoutine.add(newIndex, workout);
         } else {
             throw new IndexOutOfBoundsException("Invalid indices for reordering workouts.");
+        }
+    }
+
+    @Override
+    public void restoreWorkoutToRoutine(IWorkout workout) {
+
+        if (deleletedWorkoutsInRoutine.contains(workout)) {
+            deleletedWorkoutsInRoutine.remove(workout);
+            currentWorkoutsInRoutine.add(workout);
+        } else {
+            throw new IllegalArgumentException("This workout is not in the deleted workout list. Please try again");
         }
     }
 
@@ -75,40 +100,64 @@ public class Routine implements IRoutine {
 
     @Override
     public List<IWorkout> getWorkouts() {
-        return Collections.unmodifiableList(routine);
+        return this.currentWorkoutsInRoutine;
     }
 
+    public List<IWorkout> getDeletedWorkoutsInRoutine() {
+        return Collections.unmodifiableList(deleletedWorkoutsInRoutine);
+    }
+
+    public List<IWorkout> getCurrentWorkoutsInRoutine() {
+        return Collections.unmodifiableList(currentWorkoutsInRoutine);
+    }
+
+    //TODO FIX FORMATTING OF THIS METHOD.
     @Override
     public void printRoutine() {
-        if (routine.isEmpty()) {
+        if (currentWorkoutsInRoutine.isEmpty()) {
             System.out.println("\nRoutine \"" + name + "\":\nNo workouts in this routine.");
             return;
         }
 
         System.out.println("\nRoutine \"" + name + "\":");
 
-        for (int i = 0; i < routine.size(); i++) {
+        for (int i = 0; i < currentWorkoutsInRoutine.size(); i++) {
             System.out.print((i + 1) + ". ");
-            routine.get(i).printWorkout();
+            currentWorkoutsInRoutine.get(i).printWorkout();
             System.out.println();
         }
     }
 
+    @Override
+    public int hashcode() {
 
-    /**
-     * Creates a deep copy of the routine.
-     * @return a new Routine instance with the same workouts.
-     */
-    public Routine copyRoutine() {
-        Routine copy = new Routine(this.name);
-        for (IWorkout workout : this.routine) {
-            // Assuming Workout has a copy method
-            copy.addWorkoutToRoutine(workout);
+        int result = name.hashCode();
+
+        for(IWorkout workout : getCurrentWorkoutsInRoutine()) {
+            result = 31 * result + workout.hashcode();
         }
-        return copy;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        Routine other = (Routine) object;
+        return this.name.equals(other.name) && this.getCurrentWorkoutsInRoutine().equals(other.getCurrentWorkoutsInRoutine());
     }
 
     // Private Helper Methods
+    private void checkWorkoutIsNotNull(IWorkout workout) {
+        if(workout == null) {
+            throw new IllegalArgumentException("Cannot add, modify, or delete a null workout from routine.");
+        }
+    }
+
 
     private void checkRoutineNameValid(String name) {
         if (name == null || name.isEmpty()) {
@@ -117,34 +166,30 @@ public class Routine implements IRoutine {
     }
 
     private void checkRoutineSizeValidForEdit() {
-        if (routine.size() < 2) {
+        if (currentWorkoutsInRoutine.size() < 2) {
             throw new IllegalStateException("A routine must have at least two workouts to be editable.");
         }
     }
 
-    private void checkWorkoutAddedToRoutineIsValid(IWorkout workout) {
-        if (workout == null) {
-            throw new IllegalArgumentException("Cannot add null workout to routine.");
+    private void checkRoutineSizeValidForDeleteWorkout() {
+        if(currentWorkoutsInRoutine.size() == 1) {
+            throw new UnsupportedOperationException("A routine must have at least one workout");
         }
-        if (routine.contains(workout)) {
+    }
+
+    private void checkWorkoutAddedToRoutineIsValid(IWorkout workout) {
+       checkWorkoutIsNotNull(workout);
+        if (currentWorkoutsInRoutine.contains(workout)) {
             throw new IllegalArgumentException("The workout \"" + workout.getWorkoutName() + "\" already exists in the routine.");
         }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
+    //TODO FIX THIS METHOD TO USE THE OVERRIDEN EQUALS() OF THIS CLASS ONCE IMPLEMENTED.
+    private void checkWorkoutEditIsDifferent(IWorkout currentWorkout, IWorkout newWorkout) {
+        if (currentWorkout == null || newWorkout == null) {
+            throw new IllegalArgumentException("Both exercises must be non-null to perform an edit in workout \"" + name + "\".");
+        } else if (currentWorkout.equals(newWorkout)) {
+            throw new IllegalStateException("The new exercise must differ from the previous exercise in at least one capacity for editing in workout \"" + name + "\".");
         }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        Routine other = (Routine) obj;
-        return name.equals(other.name) && routine.equals(other.routine);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, routine);
     }
 }
